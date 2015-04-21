@@ -4,6 +4,13 @@
 #include <string>
 using namespace std;
 
+//打印的开关
+//#ifdef _DEBUG
+#ifndef _DEBUG_MONITOR
+#define _DEBUG_MONITOR
+#endif
+//#endif
+
 struct notification_t;
 struct LocalNotification;
 

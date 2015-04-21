@@ -9,11 +9,6 @@ using namespace std;
 #include "MonitorDebug.h"
 #include "MonitorUtil.h"
 
-#ifdef _DEBUG
-#define _DEBUG_MONITOR
-#endif
-
-#define _DEBUG_MONITOR
 #ifdef _DEBUG_MONITOR
 CRITICAL_SECTION debug_cs;
 CSLock lock_init(debug_cs, false, true);

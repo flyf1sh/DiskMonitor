@@ -566,8 +566,10 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 										   DWORD flag, int * LPtrCancel)
 {
 	char msgbuf[1024];
+#ifdef _DEBUG_MONITOR
 	sprintf_s(msgbuf, 1024, "call DoActWithoutNotify: act=%d ,from = %s, to = %s", act, from.c_str(), to.c_str());
 	dlog(&msgbuf[0]);
+#endif
 
 	wstring wstr_from, wstr_to, 
 			wstr_from_full, wstr_to_full, 
@@ -805,7 +807,8 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 fail:
 	if(err)
 		m_blacklist->Del(bl_item);
-	return err;
+	goto final_quit;
+
 do_in_tempdir:
 	err = FileSystemHelper::DoActWithoutNotify_impl(act, m_homew, flag, isAbsPath, m_isXP, 
 													wstr_from, wstr_to,  wstr_from_full, 
@@ -816,6 +819,11 @@ do_in_tempdir:
 				  err, act, from.c_str(), to.c_str());
 		dlog(&msgbuf[0]);
 	}
+final_quit:
+#ifdef _DEBUG_MONITOR
+	sprintf_s(msgbuf, 1024, "DoActWithoutNotify quit:%d", err);
+	dlog(&msgbuf[0]);
+#endif
 	return err;
 }
 

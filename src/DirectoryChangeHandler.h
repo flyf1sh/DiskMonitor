@@ -38,8 +38,6 @@ private:
 	static void CALLBACK TerminateProc(__in  ULONG_PTR arg);
 private:
 	static int _id;
-	int m_ntypes;	//本用来管理后台监控的数量的，但是MAXIMUM_WAIT_OBJECTS
-	int m_threads;
 	bool m_running;
 
 	HANDLE m_hThread;

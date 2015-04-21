@@ -6,8 +6,7 @@
 
 int DirectoryChangeHandler::_id = 0;
 
-DirectoryChangeHandler::DirectoryChangeHandler(int typeNum, int threadMax, DWORD waittime)
-	:m_ntypes(typeNum), m_threads(threadMax) 
+DirectoryChangeHandler::DirectoryChangeHandler(int typeNum, int threadMax, DWORD waittime):
 {
 	m_running = true;
 	m_hThread = NULL;
@@ -54,6 +53,7 @@ unsigned int WINAPI DirectoryChangeHandler::WorkThreadProc(LPVOID arg)
 		if(rc == WAIT_IO_COMPLETION)	//被异步唤醒
 		{
 			//cout << "WAIT_IO_COMPLETION called" << endl;
+			dlog("some APC message notify comed!");
 			continue;
 		}
 		if(rc == WAIT_FAILED)
@@ -61,6 +61,8 @@ unsigned int WINAPI DirectoryChangeHandler::WorkThreadProc(LPVOID arg)
 			cout << "wait failed, err code:" << GetLastError() << endl;
 			continue;
 		}
+		//XXX 如果超时和通知都被触发，但是这时候APC打断了，那优先级是timeout?
+		//如果这样就再来次timeout=0，再处理timeout，让通知有机会处理
 		if(rc == WAIT_TIMEOUT) {
 			pf->handle_timeout();	//等待的时间到了，统一处理
 		} else{
