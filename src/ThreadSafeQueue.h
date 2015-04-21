@@ -6,8 +6,9 @@
 using namespace std;
 #include "MonitorUtil.h"
 
+/*
 template <typename C>
-class CThreadSafeQueue : protected std::list<C>
+class CThreadSafeQueue : protected list<C>
 {
 public:
 	CThreadSafeQueue(int nMaxCount)
@@ -85,10 +86,11 @@ protected:
 	CRITICAL_SECTION m_Crit;
 	bool m_bOverflow;
 };
+*/
 
 //支持批量处理，用event代替信号灯，去掉最大的数量限制
 template <typename C>
-class CThreadSafeQueuePro : protected std::list<C>
+class CThreadSafeQueuePro : protected list<C>
 {
 public:
 	CThreadSafeQueuePro()
