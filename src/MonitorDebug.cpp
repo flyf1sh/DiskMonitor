@@ -13,8 +13,9 @@ using namespace std;
 CRITICAL_SECTION debug_cs;
 CSLock lock_init(debug_cs, false, true);
 
-//bool print_in_file = false;
-bool print_in_file = true;
+//打印到文件或者stdout的开关
+bool print_in_file = false;
+//bool print_in_file = true;
 ofstream logfile;
 void cout2file()
 {

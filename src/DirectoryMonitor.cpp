@@ -4,104 +4,25 @@
 #include <stdio.h>
 #include <Shellapi.h>
 #include <set>
+#include <list>
+#include <deque>
+#include <algorithm>
 using namespace std;
 
 #define MAX_CACHE_SIZE 10000
 #define BLACKLIST_CLEAR_FREQUENCY 1
+//表示timeout处理的上限次数
+#define BLACKLIST_CLEAR_UPBOUND 5
 
-class NotificationBlacklist_nouse
-{
-	typedef vector<notification_t> item_type;
-	typedef map<wstring, item_type >::iterator iter_type;
-public:
-	NotificationBlacklist_nouse()
-	{ 
-		CSLock lock_init(m_guard, false, true);
-		m_total = 0;
-		m_nclear = 0;
-	}
-	~NotificationBlacklist_nouse()
-	{
-		DestCS(&m_guard);
-	}
-	void Add(const notification_t & no)
-	{
-		CSLock lock(m_guard);
-		const wstring & pathKey = no.path;
-		iter_type it = m_blist.find(pathKey);
-		if(it != m_blist.end())
-		{//find it, add in vector
-			it->second.push_back(no);
-			return;
-		}
-		item_type v;
-		v.push_back(no);
-		m_blist[pathKey] = v;
-		m_total += 1;
-	}
-	bool Query(const notification_t & no, bool ClearWhenHit=true)
-	{
-		CSLock lock(m_guard);
-		if(m_total == 0)
-			return false;
-		return QueryList(no, ClearWhenHit, m_blist) || QueryList(no, ClearWhenHit, m_blist_gen2);
-	}
-	void Clear()
-	{
-		if(++m_nclear != BLACKLIST_CLEAR_FREQUENCY)
-			return;
-		m_nclear = 0;
-		CSLock lock(m_guard);
-		m_blist_gen2.clear();
-		m_blist.swap(m_blist_gen2);
-		m_total = m_blist_gen2.size();
-	}
-private:
-	//采取双资源模式, 这样可以有效的清理old 请求
-	map<wstring, item_type > m_blist;
-	map<wstring, item_type > m_blist_gen2;
-	int m_total, m_nclear;
-	CRITICAL_SECTION m_guard;
-private:
-	bool QueryList(const notification_t & no, bool ClearWhenHit, map<wstring, item_type > & bl)
-	{
-		if(bl.empty())
-			return false;
-		const wstring & pathKey = no.path;
-		iter_type it = bl.find(pathKey);
-		if(it == bl.end())
-			return false;
-		item_type & v = it->second;
-		for(item_type::iterator it2 = v.begin(); it2 != v.end(); ++it2)	
-		{
-			if(isMatch(no, *it2))
-			{
-				if(!ClearWhenHit) return true;
-				if(v.size() == 1)
-				{
-					bl.erase(it);
-					m_total--;
-					assert(m_total = m_blist.size() + m_blist_gen2.size());
-				}
-				else
-					v.erase(it2);
-				return true;
-			}
-		}
-		return false;
-	}
-	bool isMatch(const notification_t & q, const notification_t & aim)
-	{
-		return q == aim;	
-	}
-};
 
 struct BlacklistItem {
 	BlacklistItem(DWORD _act, const wstring & p1, const wstring & p2=wstring())
-		:act(_act), path(p1), path2(p2) { }
+		:act(_act), path(p1), path2(p2), _gen(0), _id(0) { }
 	DWORD act;
 	wstring path;
 	wstring path2;
+	int _gen;
+	int _id;
 };
 bool operator == (const struct BlacklistItem & t1, const struct BlacklistItem & t2)
 {
@@ -118,17 +39,24 @@ bool operator < (const struct BlacklistItem & t1, const struct BlacklistItem & t
 	return false;
 }
 
-class NotificationBlacklist
+ostream & operator << (ostream & out, const struct BlacklistItem & item)
+{
+	return out << "items: " << item._id << "(act = " << item.act 
+		<< " path= " << WideToMutilByte(item.path)
+		<< " path2=" << WideToMutilByte(item.path2) << ")" << endl;
+}
+
+class NotificationBlacklist_v1
 {
 	typedef struct BlacklistItem item_type;
 	typedef set<item_type >::iterator iter_type;
 public:
-	NotificationBlacklist()
+	NotificationBlacklist_v1()
 	{ 
 		CSLock lock_init(m_guard, false, true);
 		m_nclear = 0;
 	}
-	~NotificationBlacklist()
+	~NotificationBlacklist_v1()
 	{
 		DestCS(&m_guard);
 	}
@@ -142,8 +70,7 @@ public:
 		CSLock lock(m_guard);
 		m_blist.insert(item);
 		assert(item.act < FILE_ACTION_END);
-		cout << "blacklist add nofity:(act:" << item.act 
-			<< ", path:" << WideToMutilByte(item.path)<< ", path2:" << WideToMutilByte(item.path2) << ")" << endl;
+		cout << "blacklist add nofity:" << item;
 	}
 	bool Del(const BlacklistItem & item)
 	{
@@ -170,8 +97,7 @@ public:
 			int i=1;
 			cout << "blacklist not empty when clear!" << endl;
 			for(iter_type it = m_blist_gen2.begin(); it != m_blist_gen2.end(); ++it, ++i)
-				cout << "items: " << i << ":act = " << it->act << " path= " << WideToMutilByte(it->path)
-					<< " path2=" << WideToMutilByte(it->path2) << endl;
+				cout << "items: " << i << " " << *it;
 		}
 		m_blist_gen2.clear();
 		m_blist.swap(m_blist_gen2);
@@ -197,6 +123,105 @@ private:
 		return true;
 	}
 };
+
+class NotificationBlacklist
+{
+	typedef struct BlacklistItem item_type;
+	typedef list<item_type>::iterator iter_type;
+	static  int item_id;
+public:
+	NotificationBlacklist()
+	{ 
+		CSLock lock_init(m_guard, false, true);
+	}
+	~NotificationBlacklist()
+	{
+		DestCS(&m_guard);
+	}
+	void Add(DWORD act, const wstring & path, const wstring & path2)
+	{
+		Add(BlacklistItem(act, path, path2));
+	}
+	void Add(const BlacklistItem & item)
+	{
+		CSLock lock(m_guard);
+		m_blist.push_back(item);
+		BlacklistItem & it = m_blist.back();
+		it._id = item_id++;
+		assert(item.act < FILE_ACTION_END);
+		cout << "blacklist add " << it;
+	}
+	void Active(const BlacklistItem & item)
+	{
+		CSLock lock(m_guard);
+		for(list<item_type>::reverse_iterator it = m_blist.rbegin();
+			it != m_blist.rend();
+			++it )
+			if(*it == item)
+			{
+				cout << "blacklist active item::"<< it->_id << endl;
+				it->_gen = 1;
+				return;
+			}
+		cout << "o~~p, not find item, maybe query early" << endl;
+	}
+	void Del(const BlacklistItem & item)
+	{
+		CSLock lock(m_guard);
+		m_blist.remove(item);
+	}
+	bool Query(DWORD act, const wstring & path, const wstring & path2, bool ClearWhenHit=true)
+	{
+		CSLock lock(m_guard);
+		if(m_blist.empty()) return false;
+		const BlacklistItem & item = BlacklistItem(act, path, path2);
+		iter_type it = find(m_blist.begin(), m_blist.end(), item);
+		if(it == m_blist.end())
+			return false;
+		if(ClearWhenHit)
+		{
+			cout << "blacklist filt nofity "<< *it;
+			m_blist.erase(it);
+		}
+		return true;
+	}
+	//timeout 时候调用
+	int Clear()
+	{
+		CSLock lock(m_guard);
+		if(m_blist.empty()) return 0;
+		int inactive = 0, no_compl = 0;
+		for(iter_type it = m_blist.begin(); it != m_blist.end(); ++it)
+		{
+			if(it->_gen <= 0) {
+				it->_gen--;
+				if(it->_gen <= -BLACKLIST_CLEAR_UPBOUND) {
+					cout << "items: " << it->_id << " timeout inactive("<< it->_gen << ") " << *it;
+					m_blist.erase(it);
+					continue;
+				}
+				inactive++; 
+			}
+			else{
+				it->_gen++;
+				if(it->_gen > BLACKLIST_CLEAR_UPBOUND) {
+					cout << "items: " << it->_id << " timeout not complete("<< it->_gen << ") " << *it;
+					m_blist.erase(it);
+					continue;
+				}
+				no_compl++;
+			}
+			cout << "items: " << it->_id << " in the air, in active?" << (it->_gen < 0 ? "No" : "Yes") << endl;
+		}
+		return no_compl + inactive;
+	}
+private:
+	list<item_type> m_blist;
+	CRITICAL_SECTION m_guard;
+};
+
+int NotificationBlacklist::item_id = 0;
+
 
 class FileSystemHelper
 {
@@ -484,9 +509,9 @@ int DirectoryMonitor::Terminate()
 	return (int)err;
 }
 
-void DirectoryMonitor::ClearBlacklist()
+int DirectoryMonitor::ClearBlacklist()
 {
-	m_blacklist->Clear();
+	return m_blacklist->Clear();
 }
 
 
@@ -603,6 +628,8 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 	bool isOfficefile = isOffice(wstr_from);
 	bool dest_is_exist = file_exists(wstr_to_full.c_str());
 	bool isfile = true;
+	bool exist_is_ok = false;
+	deque<BlacklistItem> actives;
 
 	SHFILEOPSTRUCT FileOp; 
 	ZeroMemory((void*)&FileOp,sizeof(SHFILEOPSTRUCT));
@@ -621,6 +648,7 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 	case 0:	//删除
 		bl_item.act = FILE_ACTION_REMOVED;
 		m_blacklist->Add(bl_item);
+		actives.push_front(bl_item);
 		if(isfile || flag & FOP_RECYCLE)	//删除文件
 		{
 			FileOp.pFrom = wstr_from_full.c_str();
@@ -644,26 +672,21 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 			{
 				bl_item.act = FILE_REMOVED;
 				m_blacklist->Add(bl_item);
+				actives.push_front(bl_item);
 			}
 			bl_item.act = FILE_ADDED;
 			m_blacklist->Add(bl_item);
+			actives.push_front(bl_item);
+
 			err = CreateOfficeFile(wstr_from_full.c_str());		//不能直接用因为末尾多了个\0
-			if(err && m_isXP)
-			{
-				bl_item.act = FILE_REMOVED;
-				m_blacklist->Del(bl_item);
-				bl_item.act = FILE_ADDED;
-			}
-			if(err == ERROR_ALREADY_EXISTS)
-			{
-				m_blacklist->Del(bl_item);
-				return 0;
-			}
+			exist_is_ok = true;
 		}
 		else
 		{
 			bl_item.act = FILE_ACTION_ADDED;
 			m_blacklist->Add(bl_item);
+			actives.push_front(bl_item);
+
 			HANDLE filehd = ::CreateFile(
 										 wstr_from_full.c_str(),				// pointer to the file name
 										 GENERIC_READ | GENERIC_WRITE,			// access (read/write) mode
@@ -703,14 +726,27 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 				const wstring & fa = m_homew + L'\\' + fathers[i];
 				bl_item.path = fathers[i];
 				m_blacklist->Add(bl_item);
+
 				if(!::CreateDirectory(fa.c_str(), NULL))
-					return GetLastError();
+				{
+					m_blacklist->Del(bl_item);
+					err = GetLastError();
+					if(err != ERROR_ALREADY_EXISTS)
+						return err;
+				}else{
+					m_blacklist->Active(bl_item);
+				}
 			}
 			bl_item.path = wstr_from;
 			m_blacklist->Add(bl_item);
+			actives.push_front(bl_item);
+
 			if(!::CreateDirectory(wstr_from_full.c_str(), NULL))
-				return GetLastError();
-		}
+			{
+				err = GetLastError();
+				exist_is_ok = true;
+			}
+		}//创建文件夹层级
 		break;
 	case 3:	//移动
 		if(attr == INVALID_FILE_ATTRIBUTES)
@@ -726,7 +762,10 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 					if(err = FileSystemHelper::CreateThreadTempdir(thread_dir))
 						return err;
 				}
-				m_blacklist->Add(BlacklistItem(FILE_ACTION_REMOVED, wstr_to));
+				const BlacklistItem & item = BlacklistItem(FILE_ACTION_REMOVED, wstr_to);
+				m_blacklist->Add(item);
+				actives.push_front(item);
+
 				wstring inner_path2 = thread_dir + L"\\tmp\\" + L'\0';
 				FileOp.pFrom = wstr_to_full.c_str(); 
 				FileOp.pTo = inner_path2.c_str();
@@ -747,7 +786,8 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 			}
 			else
 			{//覆盖
-				return ERROR_FILE_EXISTS;	//FIXME 存在目录目前先这么处理吧
+				err = ERROR_FILE_EXISTS; //FIXME 存在目录目前先这么处理吧
+				goto fail;
 				//目录的目标存在的话, 按照规则取父路径,做windows默认的合并
 				//wstr_to_full = GetBaseDIR(wstr_to_full.c_str()) + L'\0';
 			}
@@ -758,17 +798,22 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 			bl_item.act = FILE_ACTION_REMOVED;
 			bl_item.path2 = wstring();
 			m_blacklist->Add(bl_item);
+			actives.push_front(bl_item);
 		}
 
 		action = FILE_ACTION_ADDED;
 		if(dest_is_exist && isfile)
 		{
 			if(m_isXP)
+			{
 				m_blacklist->Add(BlacklistItem(FILE_ACTION_REMOVED, wstr_to));	//xp 的覆盖会先发删除消息
+				actives.push_front(BlacklistItem(FILE_ACTION_REMOVED, wstr_to));
+			}
 			else 
 				action = FILE_ACTION_MODIFIED;
 		}
 		m_blacklist->Add(BlacklistItem(action, wstr_to));
+		actives.push_front(BlacklistItem(action, wstr_to));
 
 		FileOp.pFrom = wstr_from_full.c_str(); 
 		FileOp.pTo = wstr_to_full.c_str();	//移动，附带了重命名
@@ -785,10 +830,13 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 		{
 			bl_item.act = DIR_RENAMED;
 			m_blacklist->Add(bl_item);
+			actives.push_front(bl_item);
 		}
 		//bl_item.act = isfile ? FILE_RENAMED : DIR_RENAMED;	//其实这里判断够了
 		bl_item.act = FILE_RENAMED;	//防止意外多加一个文件改名(很小的几率, 但是改名这个操作很保险，所以多加一个判断无所谓)
 		m_blacklist->Add(bl_item);
+		actives.push_front(bl_item);
+
 		FileOp.pFrom = wstr_from_full.c_str(); 
 		FileOp.pTo = wstr_to_full.c_str();	//移动，附带了重命名
 		FileOp.wFunc = FO_MOVE; 
@@ -801,25 +849,31 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 		bl_item.path = wstr_to;
 		bl_item.path2 = wstring();
 		m_blacklist->Add(bl_item);
+		actives.push_front(bl_item);
 		goto do_in_tempdir;
 		break;
-	}
-fail:
-	if(err)
-		m_blacklist->Del(bl_item);
-	goto final_quit;
+	}// switch(act)
+
+	goto final_quit;	//跳过do_in_tempdir
 
 do_in_tempdir:
 	err = FileSystemHelper::DoActWithoutNotify_impl(act, m_homew, flag, isAbsPath, m_isXP, 
 													wstr_from, wstr_to,  wstr_from_full, 
 													wstr_from_name, wstr_to_name);
+
+fail:
+final_quit:
 	if(err)
 	{
 		sprintf_s(msgbuf, 1024, "meet error in DoActWithoutNotify: error code:%d, act=%d ,from = %s, to = %s", 
 				  err, act, from.c_str(), to.c_str());
 		dlog(&msgbuf[0]);
 	}
-final_quit:
+	for (deque<BlacklistItem>::iterator it = actives.begin();
+		 it != actives.end();
+		 ++it)
+		err ? m_blacklist->Del(*it) : m_blacklist->Active(*it);
+	if(exist_is_ok) err = 0;
 #ifdef _DEBUG_MONITOR
 	sprintf_s(msgbuf, 1024, "DoActWithoutNotify quit:%d", err);
 	dlog(&msgbuf[0]);
@@ -931,10 +985,7 @@ int DirectoryMonitor::GetNotify(struct TDirectoryChangeNotification & notify)
 		", file attr:" << attr << " , exist:" << no.exist << " ,act:" << notify.dwAct<< endl;
 
 	if(m_blacklist->Query(no.act, no.path, no.path2))
-	{
-		cout << "blacklist filt nofity:(act:" << no.act << ", path:" << WideToMutilByte(no.path) << ")" << endl;
 		return 0;
-	}
 	if(!filt_notify2(no))
 		m_notifications.push_back(no);
 

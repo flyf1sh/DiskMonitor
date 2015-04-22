@@ -111,6 +111,7 @@ void main2()
 	test_create_office(proj);
 	//test_shield2(proj);
 
+	cout << "input to quit:" << flush;
 	cin >> c;
 	delete proj;
 	cout << "É¾³ýproj" << endl;

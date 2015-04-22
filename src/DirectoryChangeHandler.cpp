@@ -6,7 +6,7 @@
 
 int DirectoryChangeHandler::_id = 0;
 
-DirectoryChangeHandler::DirectoryChangeHandler(int typeNum, int threadMax, DWORD waittime):
+DirectoryChangeHandler::DirectoryChangeHandler(int typeNum, int threadMax, DWORD waittime)
 {
 	m_running = true;
 	m_hThread = NULL;
@@ -213,7 +213,7 @@ void DirectoryChangeHandler::handle_timeout()
 		 it != m_monitors.end(); ++it)
 	{
 		cnt += it->second->SendNotify();
-		it->second->ClearBlacklist();	//清理黑名单
+		cnt += it->second->ClearBlacklist();	//清理黑名单
 		if(m_waittime == MAX_SLEEP_TIME)
 			it->second->release_resource();
 	}

@@ -49,7 +49,7 @@ private:
 	void UpdateAttributeCache(const wstring & rpathw);
 	DWORD GetAttributeFromCache(const wstring & rpathw, DWORD act, DWORD & self);
 
-	void ClearBlacklist();
+	int ClearBlacklist();
 private:
 	DirectoryChangeHandler * m_dc;
 	string	m_home;
