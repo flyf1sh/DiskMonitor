@@ -52,13 +52,13 @@ unsigned int WINAPI DirectoryChangeHandler::WorkThreadProc(LPVOID arg)
 		wait_t = last_wait; //怕本应该一个最后一个notify的处理等待被打断了
 		if(rc == WAIT_IO_COMPLETION)	//被异步唤醒
 		{
-			//cout << "WAIT_IO_COMPLETION called" << endl;
+			//dout << "WAIT_IO_COMPLETION called" << dendl;
 			dlog("some APC message notify comed!");
 			continue;
 		}
 		if(rc == WAIT_FAILED)
 		{
-			cout << "wait failed, err code:" << GetLastError() << endl;
+			dout << "wait failed, err code:" << GetLastError() << dendl;
 			continue;
 		}
 		//XXX 如果超时和通知都被触发，但是这时候APC打断了，那优先级是timeout?
@@ -74,7 +74,7 @@ unsigned int WINAPI DirectoryChangeHandler::WorkThreadProc(LPVOID arg)
 				pf->handle_notify(rc);
 		}
 		wait_t = pf->NextWaitTime();
-		//cout << "wait time:" << wait_t << endl;
+		//dout << "wait time:" << wait_t << dendl;
 		last_wait = wait_t;
 	}
 	return 0;
@@ -232,7 +232,7 @@ void DirectoryChangeHandler::handle_notify(int index)
 	typedef list<TDirectoryChangeNotification>::iterator iter_t;
 	typedef map<int, DirectoryMonitor*>::iterator map_iter_t;
 	map_iter_t mapit, endit = m_monitors.end();
-	//cout << "monitors.size=" << m_monitors.size()<< endl;
+	//dout << "monitors.size=" << m_monitors.size()<< dendl;
 	if(!m_monitors.empty())
 	{
 		int last_id = -1;

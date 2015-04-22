@@ -50,7 +50,7 @@ OfficeTool::OfficeTool()
 	{
 		HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 		if(FAILED(hr)){
-			cout << "init com fail" << endl;
+			dout << "init com fail" << dendl;
 		}
 		/* always do init 因为com的单线程模式？我也不懂
 		else

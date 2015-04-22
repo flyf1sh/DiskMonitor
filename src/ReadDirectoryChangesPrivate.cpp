@@ -91,7 +91,7 @@ VOID CALLBACK CReadChangesRequest::NotificationCompletion(
 		//::InterlockedDecrement(&pServer->m_nOutstandingRequests);
 		::InterlockedDecrement(&pBlock->m_pServer->m_nOutstandingRequests);
 		dlog("CReadChangesRequest::NotificationCompletion, io canceled");
-		//cout << "req ref:" << pBlock->ref() << endl;
+		//dout << "req ref:" << pBlock->ref() << dendl;
 		pBlock->clear_self();
 		pBlock->put();
 		return;

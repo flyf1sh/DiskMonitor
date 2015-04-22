@@ -154,7 +154,7 @@ public:
 	{
 		dlog("in clear_invalid,", true);
 		CSLock lock(m_Crit);
-		//cout << "size:" << this->size() << endl;
+		//dout << "size:" << this->size() << dendl;
 		list<C>::iterator it = begin();
 		for (; it != end();)
 		{

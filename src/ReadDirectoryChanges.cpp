@@ -93,7 +93,7 @@ bool CReadDirectoryChanges::DelDirectory(int id)
 	CReadChangesRequest * req = it->second;
 	m_reqs.erase(it);
 	//dlog("CReadDirectoryChanges::DelDirectory before put req");
-	//cout << "req ref:" << req->ref() << endl;
+	//dout << "req ref:" << req->ref() << dendl;
 	req->put();	//XXX 因为add那时候出错的防范
 	CReadChangesRequest * subreq = req->m_subrequest;
 	req->m_subrequest = NULL;

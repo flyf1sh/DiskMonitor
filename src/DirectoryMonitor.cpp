@@ -43,7 +43,7 @@ ostream & operator << (ostream & out, const struct BlacklistItem & item)
 {
 	return out << "items: " << item._id << "(act = " << item.act 
 		<< " path= " << WideToMutilByte(item.path)
-		<< " path2=" << WideToMutilByte(item.path2) << ")" << endl;
+		<< " path2=" << WideToMutilByte(item.path2) << ")";
 }
 
 class NotificationBlacklist_v1
@@ -70,7 +70,7 @@ public:
 		CSLock lock(m_guard);
 		m_blist.insert(item);
 		assert(item.act < FILE_ACTION_END);
-		cout << "blacklist add nofity:" << item;
+		dout << "blacklist add nofity:" << item << dendl;
 	}
 	bool Del(const BlacklistItem & item)
 	{
@@ -95,9 +95,9 @@ public:
 		if(!m_blist_gen2.empty())
 		{
 			int i=1;
-			cout << "blacklist not empty when clear!" << endl;
+			dout << "blacklist not empty when clear!" << dendl;
 			for(iter_type it = m_blist_gen2.begin(); it != m_blist_gen2.end(); ++it, ++i)
-				cout << "items: " << i << " " << *it;
+				dout << "items: " << i << " " << *it << dendl;
 		}
 		m_blist_gen2.clear();
 		m_blist.swap(m_blist_gen2);
@@ -149,7 +149,7 @@ public:
 		BlacklistItem & it = m_blist.back();
 		it._id = item_id++;
 		assert(item.act < FILE_ACTION_END);
-		cout << "blacklist add " << it;
+		dout << "blacklist add " << it << dendl;
 	}
 	void Active(const BlacklistItem & item)
 	{
@@ -159,11 +159,11 @@ public:
 			++it )
 			if(*it == item)
 			{
-				cout << "blacklist active item::"<< it->_id << endl;
+				dout << "blacklist active item::"<< it->_id << dendl;
 				it->_gen = 1;
 				return;
 			}
-		cout << "o~~p, not find item, maybe query early" << endl;
+		dout << "o~~p, not find item, maybe query early" << dendl;
 	}
 	void Del(const BlacklistItem & item)
 	{
@@ -180,7 +180,7 @@ public:
 			return false;
 		if(ClearWhenHit)
 		{
-			cout << "blacklist filt nofity "<< *it;
+			dout << "blacklist filt nofity "<< *it << dendl;
 			m_blist.erase(it);
 		}
 		return true;
@@ -196,7 +196,7 @@ public:
 			if(it->_gen <= 0) {
 				it->_gen--;
 				if(it->_gen <= -BLACKLIST_CLEAR_UPBOUND) {
-					cout << "items: " << it->_id << " timeout inactive("<< it->_gen << ") " << *it;
+					dout << "items: " << it->_id << " timeout inactive("<< it->_gen << ") " << *it << dendl;
 					m_blist.erase(it);
 					continue;
 				}
@@ -205,13 +205,13 @@ public:
 			else{
 				it->_gen++;
 				if(it->_gen > BLACKLIST_CLEAR_UPBOUND) {
-					cout << "items: " << it->_id << " timeout not complete("<< it->_gen << ") " << *it;
+					dout << "items: " << it->_id << " timeout not complete("<< it->_gen << ") " << *it << dendl;
 					m_blist.erase(it);
 					continue;
 				}
 				no_compl++;
 			}
-			cout << "items: " << it->_id << " in the air, in active?" << (it->_gen < 0 ? "No" : "Yes") << endl;
+			dout << "items: " << it->_id << " in the air, in active?" << (it->_gen < 0 ? "No" : "Yes") << dendl;
 		}
 		return no_compl + inactive;
 	}
@@ -252,7 +252,7 @@ public:
 				 0 != ::CreateDirectory((thread_dir+L"\\tmp").c_str(), NULL)))
 			{
 				DWORD err = GetLastError();
-				cout << "Create hidden dirpath fail:" << err << endl;
+				dout << "Create hidden dirpath fail:" << err << dendl;
 				return err;
 			}
 		}
@@ -504,7 +504,7 @@ int DirectoryMonitor::Terminate()
 		FileOp.wFunc = FO_DELETE; 
 		err = ::SHFileOperation(&FileOp);
 		if(err)
-			cout << "clear hidden dirpath fail:" << err << endl;
+			dout << "clear hidden dirpath fail:" << err << dendl;
 	}
 	return (int)err;
 }
@@ -967,7 +967,7 @@ int DirectoryMonitor::GetNotify(struct TDirectoryChangeNotification & notify)
 	if(isDir(attr))
 	{
 		isdir = true;
-		//cout << "path:" << WideToMutilByte(rpathw) << " is dir" << endl;
+		//dout << "path:" << WideToMutilByte(rpathw) << " is dir" << dendl;
 	}
 
 	notification_t no(notify.dwAct, rpathw, isdir);
@@ -980,9 +980,9 @@ int DirectoryMonitor::GetNotify(struct TDirectoryChangeNotification & notify)
 		no.special = true;
 		//no.filted = true;	//XXX 不要设置，因为这个是用来判断行为的，最后对special进行过滤
 	}
-	cout << "path:" << WideToMutilByte(no.path) << " is " << \
+	dout << "path:" << WideToMutilByte(no.path) << " is " << \
 	(no.special? "special":"normal") <<	(no.fspec? " ,father is special" : " ,father is OK") << \
-		", file attr:" << attr << " , exist:" << no.exist << " ,act:" << notify.dwAct<< endl;
+		", file attr:" << attr << " , exist:" << no.exist << " ,act:" << notify.dwAct<< dendl;
 
 	if(m_blacklist->Query(no.act, no.path, no.path2))
 		return 0;
@@ -1143,7 +1143,7 @@ bool DirectoryMonitor::filt_old_notify(notification_t & filter, int advance)
 	case DIR_MOVED:
 		for(; it != endit; ++it)
 		{
-			//cout << "it path:" << WideToMutilByte(it->path) << "is special:" << it->special << endl;
+			//dout << "it path:" << WideToMutilByte(it->path) << "is special:" << it->special << dendl;
 			if(it->filted) continue; 
 			//if(it->path != path && it->path != path2) continue;
 
@@ -1190,8 +1190,8 @@ bool DirectoryMonitor::filt_old_notify(notification_t & filter, int advance)
 
 void report_unexpert(const notification_t & unexpert, const wstring & expert_path)
 {
-	cout << (unexpert.isdir ? "directory:" : "file:") << WideToMutilByte(unexpert.path)  
-		<< " act:" << unexpert.act <<" not we experted. we expert: path=" << WideToMutilByte(expert_path) << endl; 
+	dout << (unexpert.isdir ? "directory:" : "file:") << WideToMutilByte(unexpert.path)  
+		<< " act:" << unexpert.act <<" not we experted. we expert: path=" << WideToMutilByte(expert_path) << dendl; 
 }
 
 bool DirectoryMonitor::filt_notify2(notification_t & notify)
@@ -1249,7 +1249,7 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 				//win7不会到达这里, 但是xp到...
 				//dlog("last dir is father, so maybe this is copydir op");
 				m_expert_act = maybe_copy_dir;
-				//cout << "last act == " << last.act << " , now is DIR_ADD, last path = " << WideToMutilByte(last.path) << endl;
+				//dout << "last act == " << last.act << " , now is DIR_ADD, last path = " << WideToMutilByte(last.path) << dendl;
 				last.act = DIR_ADDED;
 				last.handled = true;
 				break;
@@ -1310,7 +1310,7 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 				m_expert_act == maybe_move_file )
 			   && GetFileName(path) == GetFileName(m_expert_path)) //没法判断更多了
 			{
-				//cout << "in guess move act" << endl;
+				//dout << "in guess move act" << dendl;
 				if(path == m_expert_path)
 				{//被切出去又切回来（office ppt)
 					no_need_guess = true;
@@ -1319,7 +1319,7 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 				}
 				if(last.expert_act == m_expert_act)
 				{//处理
-					//cout << "we get move act" << endl;
+					//dout << "we get move act" << dendl;
 					last.filted = true;
 					notify.act = notify.isdir ? DIR_MOVED : FILE_MOVED;
 					notify.handled = true;
@@ -1336,8 +1336,8 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 			}
 			else
 			{//we see what happened 
-				cout << "m_expert_act == maybe_move_dir:" << (m_expert_act == maybe_move_dir) << endl;
-				cout << "isdir:" << notify.isdir << " ,exist:" << notify.exist<< " ,path:" << WideToMutilByte(path) << endl;
+				dout << "m_expert_act == maybe_move_dir:" << (m_expert_act == maybe_move_dir) << "\n\t" 
+					<< "isdir:" << notify.isdir << " ,exist:" << notify.exist<< " ,path:" << WideToMutilByte(path) << dendl;
 			}
 		}
 		else if(act == FILE_ACTION_REMOVED || L"" == GetBaseDIR(m_expert_path))
@@ -1453,8 +1453,8 @@ int DirectoryMonitor::SendNotify()
 			{
 				if(isOffice(it->path2))
 				{//XXX office 文件特殊处理
-					cout << "office rename filed: from " << WideToMutilByte(it->path2) 
-						<< " ,to " << WideToMutilByte(it->path) << endl;
+					dout << "office rename filed: from " << WideToMutilByte(it->path2) 
+						<< " ,to " << WideToMutilByte(it->path) << dendl;
 					it->filted = true;
 				}
 				else
@@ -1466,8 +1466,8 @@ int DirectoryMonitor::SendNotify()
 			}
 			if(!it->special && it->spec2)	//当新增
 			{
-				cout << "office rename as NEW: from " << WideToMutilByte(it->path2) 
-					<< " ,to " << WideToMutilByte(it->path) << endl;
+				dout << "office rename as NEW: from " << WideToMutilByte(it->path2) 
+					<< " ,to " << WideToMutilByte(it->path) << dendl;
 				it->act = FILE_ADDED;
 				if(isOffice(it->path))
 					it->act = FILE_MODIFIED;
@@ -1492,7 +1492,7 @@ int DirectoryMonitor::SendNotify()
 					{
 						it->filted = false;
 						UpdateAttributeCache(it->path);
-						cout << "specal flag is changed!" << endl;
+						dout << "specal flag is changed!" << dendl;
 					}
 				}
 			}
@@ -1571,7 +1571,7 @@ int DirectoryMonitor::SendNotify()
 			print_notify(m_varg, &ln);
 	}
 	m_notifications.clear();
-	//cout << "clear" << endl;
+	//dout << "clear" << dendl;
 	return size;
 }
 

@@ -24,43 +24,43 @@ void test_shield(DirectoryMonitor * dm)
 	string dn = "新增文件夹A";
 	string dn2 = "文件夹B\\文件夹C";
 	//创建文件
-	cout << "创建文件:" << fn << endl;
+	dout << "创建文件:" << fn << dendl;
 	res = dm->DoActWithoutNotify(1, fn);
 	if(res) goto fail;
 	
-	cout << "创建目录:" << dn << endl;
+	dout << "创建目录:" << dn << dendl;
 	res = dm->DoActWithoutNotify(2, dn);
 	if(res) goto fail;
-	cout << "创建目录:" << dn2 << endl;
+	dout << "创建目录:" << dn2 << dendl;
 	res = dm->DoActWithoutNotify(2, dn2);
 	if(res) goto fail;
 	//cin >> ch;
-	cout << "移动文件:" << fn << " ,到:" << dn+"\\"+fn2 << endl;
+	dout << "移动文件:" << fn << " ,到:" << dn+"\\"+fn2 << dendl;
 	res = dm->DoActWithoutNotify(3, fn, dn+"\\"+fn2);
 	if(res) goto fail;
 	//return ;
-	cout << "改名:" << dn+"\\"+fn2 << " ,到:" << dn+"\\"+fn << endl;
+	dout << "改名:" << dn+"\\"+fn2 << " ,到:" << dn+"\\"+fn << dendl;
 	res = dm->DoActWithoutNotify(4, dn+"\\"+fn2, dn+"\\"+fn);
 	if(res) goto fail;
-	cout << "拷贝 文件夹:" << dn << " ,到:" << dn2 + "\\" + dn << endl;
+	dout << "拷贝 文件夹:" << dn << " ,到:" << dn2 + "\\" + dn << dendl;
 	res = dm->DoActWithoutNotify(5, dn, dn2 + "\\" + dn);
 	if(res) goto fail;
-	cout << "删除目录:" << dn << endl;
+	dout << "删除目录:" << dn << dendl;
 	res = dm->DoActWithoutNotify(0, dn);
 	if(res) goto fail;
-	cout << "移动 文件夹:" << dn2 + "\\" + dn << " ,到:" << dn << endl;
+	dout << "移动 文件夹:" << dn2 + "\\" + dn << " ,到:" << dn << dendl;
 	res = dm->DoActWithoutNotify(3, dn2 + "\\" + dn, dn);
 	if(res) goto fail;
-	cout << "删除目录:" << dn << endl;
+	dout << "删除目录:" << dn << dendl;
 	res = dm->DoActWithoutNotify(0, dn);
 	if(res) goto fail;
-	cout << "删除目录:" << dn2 << endl;
+	dout << "删除目录:" << dn2 << dendl;
 	res = dm->DoActWithoutNotify(0, dn2);
 	if(res) goto fail;
-	cout << "test_shield end" << endl;
+	dout << "test_shield end" << dendl;
 	return ;
 fail:
-	cout << "handle fail:" << res << endl;
+	dout << "handle fail:" << res << dendl;
 }
 
 void test_shield2(DirectoryMonitor * dm)
@@ -70,7 +70,7 @@ void test_shield2(DirectoryMonitor * dm)
 	string fn = "dir1";
 	string fn_new = "dir2";
 	res = dm->DoActWithoutNotify(4, fn, fn_new);
-	cout << "move file:" << fn << " => "<< fn_new << " , res=" << res << endl;
+	dout << "move file:" << fn << " => "<< fn_new << " , res=" << res << dendl;
 }
 
 void test_create_office(DirectoryMonitor * dm)
@@ -81,12 +81,12 @@ void test_create_office(DirectoryMonitor * dm)
 	for(int i=0; i < sizeof(files)/sizeof(char*); i++)
 	{
 		res = dm->DoActWithoutNotify(1, files[i]);
-		cout << "create file:" << files[i] << " , res=" << res << endl;
+		dout << "create file:" << files[i] << " , res=" << res << dendl;
 	}
 	/*
 	wchar_t *word = L"C:\\测试盘\\项目\\myword.docx";
 	res = CreateOfficeFile(word);
-	wcout << L"create file:" << word << L" , res=" << res << endl;
+	wdout << L"create file:" << word << L" , res=" << res << dendl;
 	*/
 }
 
@@ -96,9 +96,9 @@ void main2()
 	DirectoryChangeHandler * dc = new DirectoryChangeHandler(3);
 	//DirectoryMonitor * proj = new DirectoryMonitor(dc, "C:\\测试盘\\项目", "proj", print_notify, NULL);
 	DirectoryMonitor * proj = new DirectoryMonitor(dc, "C:\\测试盘\\项目", "proj", print_notify, NULL);
-	cout << "监控proj" << endl;
+	dout << "监控proj" << dendl;
 	DirectoryMonitor * sync = new DirectoryMonitor(dc, "C:\\测试盘\\同步", "sync", print_notify, NULL);
-	cout << "监控sync" << endl;
+	dout << "监控sync" << dendl;
 	
 	Sleep(2000);
 	//test 屏蔽的api
@@ -106,25 +106,25 @@ void main2()
 	/*
 	string dn = "test_mvdir";
 	DWORD res = proj->DoActWithoutNotify(3, "test\\"+dn, dn, FOP_REPLACE);
-	cout << "test mv dir overwite:" << res << endl;
+	dout << "test mv dir overwite:" << res << dendl;
 	*/
 	test_create_office(proj);
 	//test_shield2(proj);
 
-	cout << "input to quit:" << flush;
+	dout << "input to quit:" << dflush;
 	cin >> c;
 	delete proj;
-	cout << "删除proj" << endl;
+	dout << "删除proj" << dendl;
 	delete sync;
-	cout << "删除sync" << endl;
-	cout << "go on input" << endl;
+	dout << "删除sync" << dendl;
+//	dout << "go on input" << dendl;
 //	cin >> c;
 	dc->Terminate();
-	cout << "delte dc";
-	cout << "go on input" << endl;
+	dout << "delte dc" << dendl;
+//	dout << "go on input" << dendl;
 //	cin >> c;
 	delete dc;
-	cout << "go on input" << endl;
+	dout << "go on input" << dendl;
 	cin >> c;
 	return;
 }
@@ -134,13 +134,13 @@ void test()
 	wstring dir = L"C:\\测试盘\\项目";
 	DWORD res = ::GetFileAttributes(dir.c_str());
 	if(res == INVALID_FILE_ATTRIBUTES)
-		cerr << "GetAttribute fail:" << GetLastError() << endl;
+		derr << "GetAttribute fail:" << GetLastError() << dendl;
 	else if(res & FILE_ATTRIBUTE_READONLY)
-		cout << "has readonly attr" << endl;
+		dout << "has readonly attr" << dendl;
 	else if(res & FILE_ATTRIBUTE_SYSTEM)
-		cout << "has system attr" << endl;
+		dout << "has system attr" << dendl;
 	else 
-		cout << "normal" << endl;
+		dout << "normal" << dendl;
 	char c;
 	cin >> c;
 	return;
