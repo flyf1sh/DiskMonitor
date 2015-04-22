@@ -13,48 +13,48 @@ using namespace std;
 #include "DirectoryMonitor.h"
 #include "DirectoryChangeHandler.h"
 
-//@param: act = 0 É¾³ı£»1 ĞÂÔöÎÄ¼ş£» 2 ĞÂÔöÎÄ¼ş¼Ğ£» 3 ÒÆ¶¯£» 4 ¸ÄÃû£» 5 ¿½±´
+//@param: act = 0 åˆ é™¤ï¼›1 æ–°å¢æ–‡ä»¶ï¼› 2 æ–°å¢æ–‡ä»¶å¤¹ï¼› 3 ç§»åŠ¨ï¼› 4 æ”¹åï¼› 5 æ‹·è´
 void test_shield(DirectoryMonitor * dm)
 {
 	DWORD res;
 	char ch;
-	//ĞÂÔöÎÄ¼ş 
-	string fn = "add_file ÎÄ¼ş1";
-	string fn2 = "ÎÄ¼ş2";
-	string dn = "ĞÂÔöÎÄ¼ş¼ĞA";
-	string dn2 = "ÎÄ¼ş¼ĞB\\ÎÄ¼ş¼ĞC";
-	//´´½¨ÎÄ¼ş
-	cout << "´´½¨ÎÄ¼ş:" << fn << endl;
+	//æ–°å¢æ–‡ä»¶ 
+	string fn = "add_file æ–‡ä»¶1";
+	string fn2 = "æ–‡ä»¶2";
+	string dn = "æ–°å¢æ–‡ä»¶å¤¹A";
+	string dn2 = "æ–‡ä»¶å¤¹B\\æ–‡ä»¶å¤¹C";
+	//åˆ›å»ºæ–‡ä»¶
+	cout << "åˆ›å»ºæ–‡ä»¶:" << fn << endl;
 	res = dm->DoActWithoutNotify(1, fn);
 	if(res) goto fail;
 	
-	cout << "´´½¨Ä¿Â¼:" << dn << endl;
+	cout << "åˆ›å»ºç›®å½•:" << dn << endl;
 	res = dm->DoActWithoutNotify(2, dn);
 	if(res) goto fail;
-	cout << "´´½¨Ä¿Â¼:" << dn2 << endl;
+	cout << "åˆ›å»ºç›®å½•:" << dn2 << endl;
 	res = dm->DoActWithoutNotify(2, dn2);
 	if(res) goto fail;
 	//cin >> ch;
-	cout << "ÒÆ¶¯ÎÄ¼ş:" << fn << " ,µ½:" << dn+"\\"+fn2 << endl;
+	cout << "ç§»åŠ¨æ–‡ä»¶:" << fn << " ,åˆ°:" << dn+"\\"+fn2 << endl;
 	res = dm->DoActWithoutNotify(3, fn, dn+"\\"+fn2);
 	if(res) goto fail;
 	//return ;
-	cout << "¸ÄÃû:" << dn+"\\"+fn2 << " ,µ½:" << dn+"\\"+fn << endl;
+	cout << "æ”¹å:" << dn+"\\"+fn2 << " ,åˆ°:" << dn+"\\"+fn << endl;
 	res = dm->DoActWithoutNotify(4, dn+"\\"+fn2, dn+"\\"+fn);
 	if(res) goto fail;
-	cout << "¿½±´ ÎÄ¼ş¼Ğ:" << dn << " ,µ½:" << dn2 + "\\" + dn << endl;
+	cout << "æ‹·è´ æ–‡ä»¶å¤¹:" << dn << " ,åˆ°:" << dn2 + "\\" + dn << endl;
 	res = dm->DoActWithoutNotify(5, dn, dn2 + "\\" + dn);
 	if(res) goto fail;
-	cout << "É¾³ıÄ¿Â¼:" << dn << endl;
+	cout << "åˆ é™¤ç›®å½•:" << dn << endl;
 	res = dm->DoActWithoutNotify(0, dn);
 	if(res) goto fail;
-	cout << "ÒÆ¶¯ ÎÄ¼ş¼Ğ:" << dn2 + "\\" + dn << " ,µ½:" << dn << endl;
+	cout << "ç§»åŠ¨ æ–‡ä»¶å¤¹:" << dn2 + "\\" + dn << " ,åˆ°:" << dn << endl;
 	res = dm->DoActWithoutNotify(3, dn2 + "\\" + dn, dn);
 	if(res) goto fail;
-	cout << "É¾³ıÄ¿Â¼:" << dn << endl;
+	cout << "åˆ é™¤ç›®å½•:" << dn << endl;
 	res = dm->DoActWithoutNotify(0, dn);
 	if(res) goto fail;
-	cout << "É¾³ıÄ¿Â¼:" << dn2 << endl;
+	cout << "åˆ é™¤ç›®å½•:" << dn2 << endl;
 	res = dm->DoActWithoutNotify(0, dn2);
 	if(res) goto fail;
 	cout << "test_shield end" << endl;
@@ -76,15 +76,15 @@ void test_shield2(DirectoryMonitor * dm)
 void test_create_office(DirectoryMonitor * dm)
 {
 	DWORD res;
-	const char * files[] = {"wordÎÄµµ.docx", "wordÎÄµµ2.doc", 
-		"excelÎÄµµ.xlsx", "excelÎÄµµ2.xls", "pptÎÄµµ.pptx", "pptÎÄµµ2.ppt"};
+	const char * files[] = {"wordæ–‡æ¡£.docx", "wordæ–‡æ¡£2.doc", 
+		"excelæ–‡æ¡£.xlsx", "excelæ–‡æ¡£2.xls", "pptæ–‡æ¡£.pptx", "pptæ–‡æ¡£2.ppt"};
 	for(int i=0; i < sizeof(files)/sizeof(char*); i++)
 	{
 		res = dm->DoActWithoutNotify(1, files[i]);
 		cout << "create file:" << files[i] << " , res=" << res << endl;
 	}
 	/*
-	wchar_t *word = L"C:\\²âÊÔÅÌ\\ÏîÄ¿\\myword.docx";
+	wchar_t *word = L"C:\\æµ‹è¯•ç›˜\\é¡¹ç›®\\myword.docx";
 	res = CreateOfficeFile(word);
 	wcout << L"create file:" << word << L" , res=" << res << endl;
 	*/
@@ -94,14 +94,14 @@ void main2()
 {
 	char c;
 	DirectoryChangeHandler * dc = new DirectoryChangeHandler(3);
-	//DirectoryMonitor * proj = new DirectoryMonitor(dc, "C:\\²âÊÔÅÌ\\ÏîÄ¿", "proj", print_notify, NULL);
-	DirectoryMonitor * proj = new DirectoryMonitor(dc, "C:\\²âÊÔÅÌ\\ÏîÄ¿", "proj", print_notify, NULL);
-	cout << "¼à¿Øproj" << endl;
-	DirectoryMonitor * sync = new DirectoryMonitor(dc, "C:\\²âÊÔÅÌ\\Í¬²½", "sync", print_notify, NULL);
-	cout << "¼à¿Øsync" << endl;
+	//DirectoryMonitor * proj = new DirectoryMonitor(dc, "C:\\æµ‹è¯•ç›˜\\é¡¹ç›®", "proj", print_notify, NULL);
+	DirectoryMonitor * proj = new DirectoryMonitor(dc, "C:\\æµ‹è¯•ç›˜\\é¡¹ç›®", "proj", print_notify, NULL);
+	cout << "ç›‘æ§proj" << endl;
+	DirectoryMonitor * sync = new DirectoryMonitor(dc, "C:\\æµ‹è¯•ç›˜\\åŒæ­¥", "sync", print_notify, NULL);
+	cout << "ç›‘æ§sync" << endl;
 	
 	Sleep(2000);
-	//test ÆÁ±ÎµÄapi
+	//test å±è”½çš„api
 	//test_shield(proj);
 	/*
 	string dn = "test_mvdir";
@@ -114,9 +114,9 @@ void main2()
 	cout << "input to quit:" << flush;
 	cin >> c;
 	delete proj;
-	cout << "É¾³ıproj" << endl;
+	cout << "åˆ é™¤proj" << endl;
 	delete sync;
-	cout << "É¾³ısync" << endl;
+	cout << "åˆ é™¤sync" << endl;
 	cout << "go on input" << endl;
 //	cin >> c;
 	dc->Terminate();
@@ -131,7 +131,7 @@ void main2()
 
 void test()
 {
-	wstring dir = L"C:\\²âÊÔÅÌ\\ÏîÄ¿";
+	wstring dir = L"C:\\æµ‹è¯•ç›˜\\é¡¹ç›®";
 	DWORD res = ::GetFileAttributes(dir.c_str());
 	if(res == INVALID_FILE_ATTRIBUTES)
 		cerr << "GetAttribute fail:" << GetLastError() << endl;
@@ -146,7 +146,7 @@ void test()
 	return;
 }
 
-//ÕâÀïÀ´Ö´ĞĞ
+//è¿™é‡Œæ¥æ‰§è¡Œ
 int main()
 {
 	wcout.imbue(locale("chs"));

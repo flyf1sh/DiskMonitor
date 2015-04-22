@@ -15,7 +15,7 @@ CReadDirectoryChanges::CReadDirectoryChanges()
 CReadDirectoryChanges::~CReadDirectoryChanges()
 {
 	Terminate();
-	delete m_pServer;	//ÒÆµ½TerminateµÄÏß³ÌÍË³öÊ±ºòdelete¸üºÃ£¬·ñÔò³¬Ê±ºódeleteÁËÏß³Ì»á·ÃÎÊÎŞĞ§µØÖ·
+	delete m_pServer;	//ç§»åˆ°Terminateçš„çº¿ç¨‹é€€å‡ºæ—¶å€™deleteæ›´å¥½ï¼Œå¦åˆ™è¶…æ—¶ådeleteäº†çº¿ç¨‹ä¼šè®¿é—®æ— æ•ˆåœ°å€
 }
 
 void CReadDirectoryChanges::Init()
@@ -24,7 +24,7 @@ void CReadDirectoryChanges::Init()
 	// managed by CReadChangesServer.
 	m_hThread = (HANDLE)_beginthreadex(NULL, 
 		0, 
-		CReadChangesServer::ThreadStartProc,	//Õâ¸öÏß³Ìº¯Êı¾ÍÖ»ÊÇµ¥´¿µÄsleep£¬µ«ÊÇ»á´¦ÀíÒì²½º¯Êı
+		CReadChangesServer::ThreadStartProc,	//è¿™ä¸ªçº¿ç¨‹å‡½æ•°å°±åªæ˜¯å•çº¯çš„sleepï¼Œä½†æ˜¯ä¼šå¤„ç†å¼‚æ­¥å‡½æ•°
 		m_pServer, 
 		0, 
 		&m_dwThreadId);
@@ -69,7 +69,7 @@ void CReadDirectoryChanges::AddDirectory(
 		pRequest = new CReadChangesRequest(m_pServer, wszDirectory, id, bWatchSubtree, dwNotifyFilter, dwBufferSize, ALL_TYPE);
 	}
 	else
-	{ //·ÖÀëÄ¿Â¼¼àÌıºÍÎÄ¼ş¼àÌı
+	{ //åˆ†ç¦»ç›®å½•ç›‘å¬å’Œæ–‡ä»¶ç›‘å¬
 		pRequest = new CReadChangesRequest(m_pServer, wszDirectory, id, bWatchSubtree,
 										   DIR_NOTIFY_CHANGE_FLAGS, dwBufferSize, DIR_TYPE);
 		pRequest->m_subrequest = new CReadChangesRequest(m_pServer, wszDirectory, id, bWatchSubtree,
@@ -78,7 +78,7 @@ void CReadDirectoryChanges::AddDirectory(
 	}
 	pRequest->get();
 	m_reqs[id] = pRequest;
-	//ÈÃÏß³ÌÈ¥µ÷ÓÃÕâ¸öº¯Êı£¬²¢ÇÒ»Øµ÷»á±»´¥·¢
+	//è®©çº¿ç¨‹å»è°ƒç”¨è¿™ä¸ªå‡½æ•°ï¼Œå¹¶ä¸”å›è°ƒä¼šè¢«è§¦å‘
 	::QueueUserAPC(CReadChangesServer::AddDirectoryProc, m_hThread, (ULONG_PTR)pRequest);
 	if(dwNotifyFilter == 0)
 		::QueueUserAPC(CReadChangesServer::AddDirectoryProc, m_hThread, (ULONG_PTR)pRequest->m_subrequest);
@@ -94,7 +94,7 @@ bool CReadDirectoryChanges::DelDirectory(int id)
 	m_reqs.erase(it);
 	//dlog("CReadDirectoryChanges::DelDirectory before put req");
 	//cout << "req ref:" << req->ref() << endl;
-	req->put();	//XXX ÒòÎªaddÄÇÊ±ºò³ö´íµÄ·À·¶
+	req->put();	//XXX å› ä¸ºaddé‚£æ—¶å€™å‡ºé”™çš„é˜²èŒƒ
 	CReadChangesRequest * subreq = req->m_subrequest;
 	req->m_subrequest = NULL;
 	::QueueUserAPC(CReadChangesServer::DelDirectoryProc, m_hThread, (ULONG_PTR)req);
@@ -135,7 +135,7 @@ void CReadDirectoryChanges::PopAll(list<TDirectoryChangeNotification> & li)
 	m_Notifications.pop_all(li);
 }
 
-//¼ì²éÊÇ·ñÒç³ö£¬Òç³öºóÇå¿Õ£¿£¨±È½ÏÎä¶Ï£©
+//æ£€æŸ¥æ˜¯å¦æº¢å‡ºï¼Œæº¢å‡ºåæ¸…ç©ºï¼Ÿï¼ˆæ¯”è¾ƒæ­¦æ–­ï¼‰
 bool CReadDirectoryChanges::CheckOverflow()
 {
 	bool b = m_Notifications.overflow();

@@ -17,11 +17,11 @@ using namespace std;
 #define NotifyBufferSize	4*1024*1024
 
 /*
- *	��������Ŀ¼�ĸı䣬������ʵ������һ���������߳̽��д���
- *	ÿ��ʵ������ͬʱ��ض��Ŀ¼��Ҳ����˵һ���߳����������Ŀ¼��change
- *	���ԣ�����Ҫ���Ǹ��ؾ��������
+ *	用来管理目录的改变，这个类的实例会是一个独立的线程进行处理
+ *	每个实例可以同时监控多个目录，也就是说一个线程来管理多个目录的change
+ *	所以，可能要考虑负载均衡的因素
  *
- *	XXX ���������е��ö�û�ж��̱߳�����Ҳ����˵��Ĭ���˵��������߳�ֻ��һ�� XXX
+ *	XXX 这个类的所有调用都没有多线程保护，也就是说它默认了调用它的线程只有一个 XXX
  */
 class CReadDirectoryChanges
 {
@@ -47,14 +47,14 @@ public:
 	/// </remarks>
 	void AddDirectory(LPCTSTR wszDirectory, int id, BOOL bWatchSubtree, DWORD dwNotifyFilter, DWORD dwBufferSize=NotifyBufferSize);
 
-	//����idɾ����Ӧ��req
+	//根据id删除对应的req
 	bool DelDirectory(int id);
 
 	/// <summary>
 	/// Return a handle for the Win32 Wait... functions that will be
 	/// signaled when there is a queue entry.
 	/// </summary>
-	// ���յ��Ķ��еľ�������Զ��ȡ
+	// 接收到的队列的句柄，可以多次取
 	HANDLE GetWaitHandle() { return m_Notifications.GetWaitHandle(); }
 
 	bool Pop(DWORD& dwAction, CStringW& wstrFilename, WORD& id, WORD& type);

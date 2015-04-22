@@ -13,7 +13,7 @@ using namespace std;
 CRITICAL_SECTION debug_cs;
 CSLock lock_init(debug_cs, false, true);
 
-//´òÓ¡µ½ÎÄ¼ş»òÕßstdoutµÄ¿ª¹Ø
+//æ‰“å°åˆ°æ–‡ä»¶æˆ–è€…stdoutçš„å¼€å…³
 bool print_in_file = false;
 //bool print_in_file = true;
 ofstream logfile;
@@ -32,41 +32,41 @@ void ExplainAction(DWORD dwAction, const string & sfilename, WORD id, WORD t, co
 	bool iunknow = false;
 	if(filted)
 		cout << "filt item:";
-	string type = t==DIR_TYPE?"Ä¿Â¼":"ÎÄ¼ş";
+	string type = t==DIR_TYPE?"ç›®å½•":"æ–‡ä»¶";
 	switch (dwAction)
 	{
 	case FILE_ACTION_ADDED:
 		//cout << "ok, add a file/dir, size="<<sfilename.length()<<",last:"<<sfilename[sfilename.length()-1]<<endl;
-		cout<<id<<" Ìí¼Ó" << type << "=>"<<sfilename<<endl;
+		cout<<id<<" æ·»åŠ " << type << "=>"<<sfilename<<endl;
 		break;
 	case FILE_ACTION_REMOVED:
-		cout<<id<<" É¾³ı" << type << "=>"<<sfilename<<endl;
+		cout<<id<<" åˆ é™¤" << type << "=>"<<sfilename<<endl;
 		break;
 	case FILE_ACTION_MODIFIED:
-		cout<<id<<" ĞŞ¸Ä" << type << "ÄÚÈİ=>"<<sfilename<<endl;
+		cout<<id<<" ä¿®æ”¹" << type << "å†…å®¹=>"<<sfilename<<endl;
 		break;
 	case FILE_ACTION_RENAMED_OLD_NAME:
-		cout<<id<< " " << type << "ÖØÃüÃû ¾É=>"<<sfilename<<endl;
+		cout<<id<< " " << type << "é‡å‘½å æ—§=>"<<sfilename<<endl;
 		break;
 	case FILE_ACTION_RENAMED_NEW_NAME:
-		cout<<id<< " " << type << "ÖØÃüÃû ĞÂ=>"<<sfilename<<endl;
+		cout<<id<< " " << type << "é‡å‘½å æ–°=>"<<sfilename<<endl;
 		break;
 
 	case FILE_ADDED:
 	case DIR_ADDED:
-		cout<<id<< " ĞÂÔö" << type << " " << sfilename << endl;
+		cout<<id<< " æ–°å¢" << type << " " << sfilename << endl;
 		break;
 	case FILE_RENAMED:
 	case DIR_RENAMED:
-		cout<<id<< " " << type << "ÖØÃüÃû " <<  path2 << " => " << sfilename << endl;
+		cout<<id<< " " << type << "é‡å‘½å " <<  path2 << " => " << sfilename << endl;
 		break;
 	case FILE_MOVED:
 	case DIR_MOVED:
-		cout<<id<< " " << type << "ÒÆ¶¯ " << path2 << " => " << sfilename << endl;
+		cout<<id<< " " << type << "ç§»åŠ¨ " << path2 << " => " << sfilename << endl;
 		break;
 	case FILE_REMOVED:
 	case DIR_REMOVED:
-		cout<<id<<" É¾³ı" << type << ":"<<sfilename<<endl;
+		cout<<id<<" åˆ é™¤" << type << ":"<<sfilename<<endl;
 		break;
 	case DIR_COPY:
 		cout<<id<< " " << type << " copy: " << sfilename << endl;

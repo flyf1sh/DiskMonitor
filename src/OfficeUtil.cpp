@@ -52,7 +52,7 @@ OfficeTool::OfficeTool()
 		if(FAILED(hr)){
 			cout << "init com fail" << endl;
 		}
-		/* always do init ÒòÎªcomµÄµ¥Ïß³ÌÄ£Ê½£¿ÎÒÒ²²»¶®
+		/* always do init å› ä¸ºcomçš„å•çº¿ç¨‹æ¨¡å¼ï¼Ÿæˆ‘ä¹Ÿä¸æ‡‚
 		else
 			OfficeTool::com_init = true;
 		*/

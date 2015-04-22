@@ -15,10 +15,10 @@ public:
 	{
 		m_bOverflow = false;
 		m_hSemaphore = ::CreateSemaphore(
-			NULL,		//²»°²È«µÄÊôĞÔ
-			0 ,			//³õÊ¼Öµ
-			nMaxCount,	//×î´óÖµ
-			NULL);		//¶ÔÏóÃû³Æ
+			NULL,		//ä¸å®‰å…¨çš„å±æ€§
+			0 ,			//åˆå§‹å€¼
+			nMaxCount,	//æœ€å¤§å€¼
+			NULL);		//å¯¹è±¡åç§°
 		InitCS(&m_Crit);
 	}
 	~CThreadSafeQueue()
@@ -33,10 +33,10 @@ public:
 		CSLock lock(m_Crit);
 		push_back(c);
 		lock.Unlock();
-		//ÓÃÓÚ¶ÔÖ¸¶¨µÄĞÅºÅÁ¿Ôö¼ÓÖ¸¶¨µÄÖµ
+		//ç”¨äºå¯¹æŒ‡å®šçš„ä¿¡å·é‡å¢åŠ æŒ‡å®šçš„å€¼
 		if (!::ReleaseSemaphore(m_hSemaphore, 1, NULL))
 		{
-			//Èç¹ûĞÅºÅÂúÁË,É¾³ı
+			//å¦‚æœä¿¡å·æ»¡äº†,åˆ é™¤
 			pop_back();
 			if (GetLastError() == ERROR_TOO_MANY_POSTS)
 			{
@@ -44,15 +44,15 @@ public:
 			}
 		}
 	}
-	//Èç¹û²»Ö¹Ò»´Îµ÷ÓÃpop(),¼ÇÂ¼ĞÅºÅÁ¿Êı¡£
-	//FIXME: Ã»±ØÒª·µ»ØÊ§°Ü
+	//å¦‚æœä¸æ­¢ä¸€æ¬¡è°ƒç”¨pop(),è®°å½•ä¿¡å·é‡æ•°ã€‚
+	//FIXME: æ²¡å¿…è¦è¿”å›å¤±è´¥
 	bool pop(C& c)
 	{
 		CSLock lock(m_Crit);
-		//Èç¹ûÊÇ¿Õ£¬»á²»»áËÀËø?
+		//å¦‚æœæ˜¯ç©ºï¼Œä¼šä¸ä¼šæ­»é”?
 		if (empty()) 
 		{
-			//ÕâÀïÊÇÎªÁËÇå¿ÕĞÅºÅÁ¿µÄsignal
+			//è¿™é‡Œæ˜¯ä¸ºäº†æ¸…ç©ºä¿¡å·é‡çš„signal
 			while (::WaitForSingleObject(m_hSemaphore, 0) != WAIT_TIMEOUT)
 				1;
 			return false;
@@ -62,7 +62,7 @@ public:
 		return true;
 	} 
 
-	//Èç¹ûÒç³öÊ¹ÓÃÏÂÃæµÄ¶ÓÁĞ
+	//å¦‚æœæº¢å‡ºä½¿ç”¨ä¸‹é¢çš„é˜Ÿåˆ—
 	void clear()
 	{
 		CSLock lock(m_Crit);
@@ -74,12 +74,12 @@ public:
 
 		m_bOverflow = false;
 	}
-	//Òç³ö
+	//æº¢å‡º
 	bool overflow()
 	{
 		return m_bOverflow;
 	}
-	//»ñµÃ¾ä±ú
+	//è·å¾—å¥æŸ„
 	HANDLE GetWaitHandle() { return m_hSemaphore; }
 protected:
 	HANDLE m_hSemaphore;
@@ -88,7 +88,7 @@ protected:
 };
 */
 
-//Ö§³ÖÅúÁ¿´¦Àí£¬ÓÃevent´úÌæĞÅºÅµÆ£¬È¥µô×î´óµÄÊıÁ¿ÏŞÖÆ
+//æ”¯æŒæ‰¹é‡å¤„ç†ï¼Œç”¨eventä»£æ›¿ä¿¡å·ç¯ï¼Œå»æ‰æœ€å¤§çš„æ•°é‡é™åˆ¶
 template <typename C>
 class CThreadSafeQueuePro : protected list<C>
 {
@@ -115,7 +115,7 @@ public:
 	bool pop(C& c)
 	{
 		CSLock lock(m_Crit);
-		//Èç¹ûÊÇ¿Õ£¬»á²»»áËÀËø?
+		//å¦‚æœæ˜¯ç©ºï¼Œä¼šä¸ä¼šæ­»é”?
 		if (empty()) 
 		{
 			return false;
@@ -123,7 +123,7 @@ public:
 		c = front();
 		pop_front();
 		if(!empty())
-			::SetEvent(m_event);	//·¢ĞÅºÅ£¬¼¤»îÏÂÒ»¸ö
+			::SetEvent(m_event);	//å‘ä¿¡å·ï¼Œæ¿€æ´»ä¸‹ä¸€ä¸ª
 		return true;
 	} 
 
@@ -141,7 +141,7 @@ public:
 		swap(li);
 	}
 
-	//×îºóÇåÀí£¬²»ĞèÒª»½ĞÑµÈ´ıµÄÏß³Ì
+	//æœ€åæ¸…ç†ï¼Œä¸éœ€è¦å”¤é†’ç­‰å¾…çš„çº¿ç¨‹
 	void clear()
 	{
 		CSLock lock(m_Crit);
@@ -163,7 +163,7 @@ public:
 	}
 
 	bool overflow(){ return false; }
-	//»ñµÃ¾ä±ú
+	//è·å¾—å¥æŸ„
 	HANDLE GetWaitHandle() { return m_event; }
 protected:
 	HANDLE m_event;

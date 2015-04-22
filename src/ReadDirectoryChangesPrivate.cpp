@@ -46,7 +46,7 @@ bool CReadChangesRequest::OpenDirectory()
 		| FILE_SHARE_DELETE,
 		NULL,                               // security descriptor
 		OPEN_EXISTING,                      // how to create
-		FILE_FLAG_BACKUP_SEMANTICS |		// ±ØÐë¼Ó£¬·ñÔò´´½¨Ê§°Ü
+		FILE_FLAG_BACKUP_SEMANTICS |		// å¿…é¡»åŠ ï¼Œå¦åˆ™åˆ›å»ºå¤±è´¥
 		FILE_FLAG_OVERLAPPED,				// file attributes
 		NULL);                              // file with attributes to copy
 
@@ -74,8 +74,8 @@ void CReadChangesRequest::BeginRead()
 		&NotificationCompletion);           // completion routine
 }
 
-//Ïß³Ì»Øµ÷Õâ¸öº¯Êý£¬Ò²¾ÍÊÇËµ£¬ÏÂ´ÎÏûÏ¢À´Ê±ºò£¬±ØÐëµÈ´ýÕâ¸öº¯Êý½áÊø
-//ËùÒÔ£¬´¦ÀíËÙ¶ÈÓ¦¸Ã¾¡¿ÉÄÜµÄ¿ì
+//çº¿ç¨‹å›žè°ƒè¿™ä¸ªå‡½æ•°ï¼Œä¹Ÿå°±æ˜¯è¯´ï¼Œä¸‹æ¬¡æ¶ˆæ¯æ¥æ—¶å€™ï¼Œå¿…é¡»ç­‰å¾…è¿™ä¸ªå‡½æ•°ç»“æŸ
+//æ‰€ä»¥ï¼Œå¤„ç†é€Ÿåº¦åº”è¯¥å°½å¯èƒ½çš„å¿«
 //static
 VOID CALLBACK CReadChangesRequest::NotificationCompletion(
 	DWORD dwErrorCode,									// completion code
@@ -84,7 +84,7 @@ VOID CALLBACK CReadChangesRequest::NotificationCompletion(
 {
 	CReadChangesRequest* pBlock = (CReadChangesRequest*)lpOverlapped->hEvent;
 
-	//·µ»ØÕâ¸ö´íÎóµÄÇéÐÎ:io±»cancelÁË(CancelIo), ÔÚÕâÀïÊÍ·Årequest
+	//è¿”å›žè¿™ä¸ªé”™è¯¯çš„æƒ…å½¢:ioè¢«canceläº†(CancelIo), åœ¨è¿™é‡Œé‡Šæ”¾request
 	if (dwErrorCode == ERROR_OPERATION_ABORTED)
 	{
 		//CReadChangesServer* pServer = pBlock->m_pServer;
@@ -105,17 +105,17 @@ VOID CALLBACK CReadChangesRequest::NotificationCompletion(
 	if(!dwNumberOfBytesTransfered)
 		return;
 
-	//×ªÒÆbuffer
-	//Îª·ÀÖ¹´¦Àí²»¹»¼°Ê±£¬ÊÇ²»ÊÇ¿¼ÂÇ¶à¸öoutbuffer?
+	//è½¬ç§»buffer
+	//ä¸ºé˜²æ­¢å¤„ç†ä¸å¤ŸåŠæ—¶ï¼Œæ˜¯ä¸æ˜¯è€ƒè™‘å¤šä¸ªoutbuffer?
 	pBlock->BackupBuffer(dwNumberOfBytesTransfered);
 
-	// ¾¡¿ìµÄÌÚ³öbuffer£¬ÖØÐÂ¼ÓÈëÐÂµÄ¼àÌý
+	// å°½å¿«çš„è…¾å‡ºbufferï¼Œé‡æ–°åŠ å…¥æ–°çš„ç›‘å¬
 	// Get the new read issued as fast as possible. The documentation
 	// says that the original OVERLAPPED structure will not be used
 	// again once the completion routine is called.
 	pBlock->BeginRead();
 
-	//TODO: Õâ¸ö´¦Àí¿ÉÄÜ±È½ÏÂý, µ«ÊÇÕâÀï´¦ÀíÂß¼­¼òµ¥
+	//TODO: è¿™ä¸ªå¤„ç†å¯èƒ½æ¯”è¾ƒæ…¢, ä½†æ˜¯è¿™é‡Œå¤„ç†é€»è¾‘ç®€å•
 	pBlock->ProcessNotification();
 }
 
@@ -129,7 +129,7 @@ void CReadChangesRequest::ProcessNotification()
 		FILE_NOTIFY_INFORMATION& fni = (FILE_NOTIFY_INFORMATION&)*pBase;
 
 		CStringW wstrFilename(fni.FileName, fni.FileNameLength/sizeof(wchar_t));
-		//²»×éºÏÈ«Â·¾¶µÄpath£¬Ö±½ÓÓÃid´úÌæ
+		//ä¸ç»„åˆå…¨è·¯å¾„çš„pathï¼Œç›´æŽ¥ç”¨idä»£æ›¿
 		/*
 		// Handle a trailing backslash, such as for a root directory.
 		if (m_wstrDirectory.Right(1) != L"\\")
@@ -160,14 +160,14 @@ void CReadChangesRequest::ProcessNotification()
 			break;
 		pBase += fni.NextEntryOffset;
 	};
-	//±¾À´ÏëÓÃÕâ¸öÀ´±íÊ¾½áÊø·û£¬µ«ÊÇ·¢ÏÖÃ»ÓÐ¹æÂÉ!!·ÅÆúÕâ¸ö×ö·¨
+	//æœ¬æ¥æƒ³ç”¨è¿™ä¸ªæ¥è¡¨ç¤ºç»“æŸç¬¦ï¼Œä½†æ˜¯å‘çŽ°æ²¡æœ‰è§„å¾‹!!æ”¾å¼ƒè¿™ä¸ªåšæ³•
 	//notifications.push_back(TDirectoryChangeNotification(FILE_ACTION_END, L"", m_id, m_ftype));	
 	m_pServer->m_pBase->PushN(notifications);
 }
 
 void CReadChangesRequest::clear_self()
 {
-	//Çå¿Õ×Ô¼ºµÄÍ¨Öª
+	//æ¸…ç©ºè‡ªå·±çš„é€šçŸ¥
 	m_pServer->m_pBase->clear_notify(m_id);
 }
 
@@ -178,6 +178,6 @@ void CReadChangesServer::Run()
 	{
 		DWORD rc = ::SleepEx(INFINITE, true);
 	}
-	//Ïß³ÌÍË³ö£¬Ó¦¸Ã±êÊ¶changesÊµÀýÏú»Ù£¬µ«ÊÇÈçºÎÍ¨Öª°üº¬ËüµÄÈÝÆ÷ÄØ£¿
+	//çº¿ç¨‹é€€å‡ºï¼Œåº”è¯¥æ ‡è¯†changeså®žä¾‹é”€æ¯ï¼Œä½†æ˜¯å¦‚ä½•é€šçŸ¥åŒ…å«å®ƒçš„å®¹å™¨å‘¢ï¼Ÿ
 	m_pBase->Release();
 }

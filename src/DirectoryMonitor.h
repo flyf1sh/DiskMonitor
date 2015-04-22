@@ -10,8 +10,8 @@ using namespace std;
 struct TDirectoryChangeNotification;
 
 /*
- *	ÓÃÀ´ÉèÖÃ¼à¿ØÄ¿Â¼µÄÀà, Ã¿Ò»¸öÄ¿Â¼Ò»¸öÊµÀı£¬¿ÉÒÔÑ¡×ÅÆÁ±ÎµÄÎÄ¼ş£¨¼Ğ£©
- *	DirectoryChangeHandler µÄ×ÓÏß³Ì»á»Øµ÷ÕâÀïº¯Êı´¦ÀíÏàÓ¦µÄÄ¿Â¼±ä»¯
+ *	ç”¨æ¥è®¾ç½®ç›‘æ§ç›®å½•çš„ç±», æ¯ä¸€ä¸ªç›®å½•ä¸€ä¸ªå®ä¾‹ï¼Œå¯ä»¥é€‰ç€å±è”½çš„æ–‡ä»¶ï¼ˆå¤¹ï¼‰
+ *	DirectoryChangeHandler çš„å­çº¿ç¨‹ä¼šå›è°ƒè¿™é‡Œå‡½æ•°å¤„ç†ç›¸åº”çš„ç›®å½•å˜åŒ–
  */
 class DirectoryMonitor
 {
@@ -24,13 +24,13 @@ public:
 
 	int State() const { return m_running;}
 
-	//ÆÁ±ÎÍ¨ÖªÏûÏ¢µÄ¶¯×÷£¬Ö÷ÒªÓÃÓÚlistupdate/treeºó±¾µØµÄ¸üĞÂ
-	//@retrun: ³É¹¦·µ»Ø0£¬ Ê§°Ü·µ»Ø´íÎóÂë
-	//@param: act = 0 É¾³ı£»1 ĞÂÔöÎÄ¼ş£» 2 ĞÂÔöÎÄ¼ş¼Ğ£» 3 ÒÆ¶¯£» 4 ¸ÄÃû£» 5 ¿½±´£»
-	//@param: LPtrCancel ÓÃÀ´È¡ÏûÕâ¸ö²Ù×÷µÄflag£» ³õÊ¼Îª0£¬ÉèÖÃÎª1È¡Ïû²Ù×÷ (ÔİÊ±Î´ÊµÏÖ)
-	//@param: from ¿ÉÒÔ¶àÎÄ¼şÊäÈë×ñÑ­SHFileOperationµÄÊäÈëÎÄ¼ş¹æÔò( µ«ÊÇÄ¿Ç°ÓÃÒ»¸ö¸öµÄ×öÀ´ÊµÏÖ°É)
+	//å±è”½é€šçŸ¥æ¶ˆæ¯çš„åŠ¨ä½œï¼Œä¸»è¦ç”¨äºlistupdate/treeåæœ¬åœ°çš„æ›´æ–°
+	//@retrun: æˆåŠŸè¿”å›0ï¼Œ å¤±è´¥è¿”å›é”™è¯¯ç 
+	//@param: act = 0 åˆ é™¤ï¼›1 æ–°å¢æ–‡ä»¶ï¼› 2 æ–°å¢æ–‡ä»¶å¤¹ï¼› 3 ç§»åŠ¨ï¼› 4 æ”¹åï¼› 5 æ‹·è´ï¼›
+	//@param: LPtrCancel ç”¨æ¥å–æ¶ˆè¿™ä¸ªæ“ä½œçš„flagï¼› åˆå§‹ä¸º0ï¼Œè®¾ç½®ä¸º1å–æ¶ˆæ“ä½œ (æš‚æ—¶æœªå®ç°)
+	//@param: from å¯ä»¥å¤šæ–‡ä»¶è¾“å…¥éµå¾ªSHFileOperationçš„è¾“å…¥æ–‡ä»¶è§„åˆ™( ä½†æ˜¯ç›®å‰ç”¨ä¸€ä¸ªä¸ªçš„åšæ¥å®ç°å§)
 	DWORD DoActWithoutNotify(int act, const string & from, const string & to=string(), DWORD flag=0, int * LPtrCancel=NULL);
-	//ÓÃblacklistÀ´ÊµÏÖÆÁ±Î
+	//ç”¨blacklistæ¥å®ç°å±è”½
 	DWORD DoActWithoutNotify2(int act, const string & from, const string & to=string(), DWORD flag=0, int * LPtrCancel=NULL);
 
 private:
@@ -38,10 +38,10 @@ private:
 	void Resume()	{};//{m_running = 1;}
 
 private:
-	//³·ÏúÕâ¸ö¼à¿Ø£¨ÏÖÔÚ»¹Ã»ÓĞÓÃµ½£¬Ò²¾ÍÊÇÔÊĞíÓÃ»§²»¼à¿ØÕâ¸öÄ¿Â¼£©
+	//æ’¤é”€è¿™ä¸ªç›‘æ§ï¼ˆç°åœ¨è¿˜æ²¡æœ‰ç”¨åˆ°ï¼Œä¹Ÿå°±æ˜¯å…è®¸ç”¨æˆ·ä¸ç›‘æ§è¿™ä¸ªç›®å½•ï¼‰
 	int Terminate();
 	int GetNotify(struct TDirectoryChangeNotification & notify);
-	int SendNotify(); //·µ»Ø·¢ËÍµÄÊıÁ¿
+	int SendNotify(); //è¿”å›å‘é€çš„æ•°é‡
 	bool filt_notify2(notification_t & notify);
 	bool guess(notification_t & notify);
 	bool filt_old_notify(notification_t & filter, int advance);
@@ -54,8 +54,8 @@ private:
 	DirectoryChangeHandler * m_dc;
 	string	m_home;
 	wstring m_homew;
-	wstring m_silent_dir;	//ÆÁ±ÎÏûÏ¢Ä¿Â¼
-	string	m_type;							//Õâ¸ö¼à¿ØËùÊôµÄÀàĞÍ
+	wstring m_silent_dir;	//å±è”½æ¶ˆæ¯ç›®å½•
+	string	m_type;							//è¿™ä¸ªç›‘æ§æ‰€å±çš„ç±»å‹
 	void (*m_cbp)(void *, LocalNotification *);
 	void * m_varg;
 
@@ -63,17 +63,17 @@ private:
 	volatile int m_running;		//run flag
 	
 
-	//Í¨Öª¹ıÂË²¿·Ö
-	vector<notification_t>	m_notifications;	//Ôİ´æµÄÍ¨Öª£¬ÓÃÀ´¹ıÂËºÍÍ³Ò»·¢³ö
-	map<wstring, DWORD>		m_file_attrs;		//ÎÄ¼şÄ¿Â¼µÄattr£¬Èç¹û²»´æÔÚÊÇ1
-	wstring m_expert_path;	//²ÂÏëÏÂÒ»¸öÍ¨ÖªµÄÂ·¾¶
-	WORD m_expert_act;	//²ÂÏëÏÂÒ»¸ö²Ù×÷
-	int m_guess_cnt;	//×öÉÏ´Î²ÂÏë½øÈëµÄ¼ÆÊı
-	class NotificationBlacklist * m_blacklist;	//ÆÁ±ÎÏûÏ¢ºÚÃûµ¥
-	//notification_t m_boss;	//ÉÏ´ÎÍ¨ÖªÆô¶¯µÄÖ÷	??
+	//é€šçŸ¥è¿‡æ»¤éƒ¨åˆ†
+	vector<notification_t>	m_notifications;	//æš‚å­˜çš„é€šçŸ¥ï¼Œç”¨æ¥è¿‡æ»¤å’Œç»Ÿä¸€å‘å‡º
+	map<wstring, DWORD>		m_file_attrs;		//æ–‡ä»¶ç›®å½•çš„attrï¼Œå¦‚æœä¸å­˜åœ¨æ˜¯1
+	wstring m_expert_path;	//çŒœæƒ³ä¸‹ä¸€ä¸ªé€šçŸ¥çš„è·¯å¾„
+	WORD m_expert_act;	//çŒœæƒ³ä¸‹ä¸€ä¸ªæ“ä½œ
+	int m_guess_cnt;	//åšä¸Šæ¬¡çŒœæƒ³è¿›å…¥çš„è®¡æ•°
+	class NotificationBlacklist * m_blacklist;	//å±è”½æ¶ˆæ¯é»‘åå•
+	//notification_t m_boss;	//ä¸Šæ¬¡é€šçŸ¥å¯åŠ¨çš„ä¸»	??
 	//debug
 	bool m_showfilt;
-	bool m_isXP;	//xpÏµÍ³´¦ÀíÓĞĞ©²»Í¬
+	bool m_isXP;	//xpç³»ç»Ÿå¤„ç†æœ‰äº›ä¸åŒ
 };
 
 #endif

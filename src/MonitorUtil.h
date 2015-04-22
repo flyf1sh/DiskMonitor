@@ -31,13 +31,13 @@ using namespace std;
 #define FILE_MOVED		(FILE_ACTION + 6)
 #define DIR_MOVED		(FILE_ACTION + 7)
 #define FILE_MODIFIED	(FILE_ACTION + 8)
-//ĞèÒªÍâ²¿±éÀúÕâ¸öÄ¿Â¼
+//éœ€è¦å¤–éƒ¨éå†è¿™ä¸ªç›®å½•
 #define DIR_COPY		(FILE_ACTION + 9)
 
-//Í¨Öª½áÊø±êÊ¾·û
+//é€šçŸ¥ç»“æŸæ ‡ç¤ºç¬¦
 #define FILE_ACTION_END	(FILE_ACTION + 100)
 
-//ÄÚ²¿×´Ì¬
+//å†…éƒ¨çŠ¶æ€
 #define FILE_ACTION_ADDED_RENAMED (FILE_ACTION + 10)
 
 #define TEMP_DIRNAME	"~.temp_zbkc2014"
@@ -58,15 +58,15 @@ typedef struct notification_t{
 	DWORD attr;		//file attribute
 	wstring path;
 	wstring path2;
-	WORD id;		//Í¬ÃûµÈ´ı¸öÊı(Ã»ÓĞÓÃÁ´±íµÄ´úÌæ·½°¸)
-	WORD expert_act;	//ÆÚ´ıµÄ²Ù×÷
+	WORD id;		//åŒåç­‰å¾…ä¸ªæ•°(æ²¡æœ‰ç”¨é“¾è¡¨çš„ä»£æ›¿æ–¹æ¡ˆ)
+	WORD expert_act;	//æœŸå¾…çš„æ“ä½œ
 	bool isdir;		//file or dir
-	bool filted;	//ÊÇ·ñ±»¹ıÂËÁË£¬Õâ¸öÊÇÒÀ¾İ¹ıÂË¹æÔò¹ıÂË
-	bool handled;	//×ª»»ÁËact	//XXX Ã»¶à´óÓÃ 
-	bool special;	//ÌØÊâÎÄ¼şÄ¿Â¼£¨Òş²Ø£¬ÏµÍ³£©
-	bool spec2;		//¼ÇÂ¼ÉÏÒ»¸öÎÄ¼şÊôĞÔ
-	bool fspec;		//¸¸Â·¾¶ÊÇÌØÊâµÄ£¬±¾Éí²»ÊÇ
-	bool exist;		//½Úµã´æÔÚ
+	bool filted;	//æ˜¯å¦è¢«è¿‡æ»¤äº†ï¼Œè¿™ä¸ªæ˜¯ä¾æ®è¿‡æ»¤è§„åˆ™è¿‡æ»¤
+	bool handled;	//è½¬æ¢äº†act	//XXX æ²¡å¤šå¤§ç”¨ 
+	bool special;	//ç‰¹æ®Šæ–‡ä»¶ç›®å½•ï¼ˆéšè—ï¼Œç³»ç»Ÿï¼‰
+	bool spec2;		//è®°å½•ä¸Šä¸€ä¸ªæ–‡ä»¶å±æ€§
+	bool fspec;		//çˆ¶è·¯å¾„æ˜¯ç‰¹æ®Šçš„ï¼Œæœ¬èº«ä¸æ˜¯
+	bool exist;		//èŠ‚ç‚¹å­˜åœ¨
 	notification_t(){};
 	notification_t(DWORD action, const wstring & rpath, bool _isdir):
 		act(action), attr(0), path(rpath), id(0), expert_act(0), 
@@ -94,8 +94,8 @@ inline bool operator == (const notification_t & no, const notification_t & other
 	return no.act == other.act && no.path == other.path && no.path2 == other.path2;
 }
 
-//Íâ²¿Êı¾İ½á¹¹
-//ÒÆ¶¯¿½±´¸ÄÃûÄ¿Â¼ ³åÍ»Ê±µÄÑ¡Ïî Ä¬ÈÏ merge
+//å¤–éƒ¨æ•°æ®ç»“æ„
+//ç§»åŠ¨æ‹·è´æ”¹åç›®å½• å†²çªæ—¶çš„é€‰é¡¹ é»˜è®¤ merge
 #define FOP_OVERWRITE_MERGE 0x01
 #define FOP_REPLACE			0x02
 #define FOP_RECYCLE			0x04
@@ -104,17 +104,17 @@ inline bool operator == (const notification_t & no, const notification_t & other
 #define FOP_ROLLBACK		0x20
 
 typedef struct LocalOp{
-		int act;			//²Ù×÷
-		string from;		//Èç¹ûÊÇÒÆ¶¯²Ù×÷£¬ÊÇÒÆ¶¯µÄÏà¶Ô¼à¿ØµÄÂ·¾¶£»Èç¹ûÊÇ¸ÄÃû£¬ÊÇ¸ÄÃûÇ°Ãû³Æ£» ·ñÔòÎª¿Õ
-		string to;			//±»²Ù×÷µÄÎÄ¼şÃû/Ä¿Â¼Ãû£»¸¸Â·¾¶ÓÉLocalNotificationÌá¹©
+		int act;			//æ“ä½œ
+		string from;		//å¦‚æœæ˜¯ç§»åŠ¨æ“ä½œï¼Œæ˜¯ç§»åŠ¨çš„ç›¸å¯¹ç›‘æ§çš„è·¯å¾„ï¼›å¦‚æœæ˜¯æ”¹åï¼Œæ˜¯æ”¹åå‰åç§°ï¼› å¦åˆ™ä¸ºç©º
+		string to;			//è¢«æ“ä½œçš„æ–‡ä»¶å/ç›®å½•åï¼›çˆ¶è·¯å¾„ç”±LocalNotificationæä¾›
 }LocalOp;
 
-//Í¬Ò»Â·¾¶ÏÂÍ¨ÖªµÄ¼¯ºÏ, Í¨Öª±¾ÉíºÍ×Óop¶¼ÊÇÊ±ĞòµÄ
+//åŒä¸€è·¯å¾„ä¸‹é€šçŸ¥çš„é›†åˆ, é€šçŸ¥æœ¬èº«å’Œå­opéƒ½æ˜¯æ—¶åºçš„
 typedef struct LocalNotification{
-	string basedir;		//¼à¿ØµÄÂ·¾¶
-	string fpath;		//¸¸Â·¾¶, ¸ùÂ·¾¶Îª""
-	string t;			//±êÊ¶
-	vector<LocalOp> ops;	//Í¬Ò»Ä¿Â¼ÏÂµÄ²Ù×÷
+	string basedir;		//ç›‘æ§çš„è·¯å¾„
+	string fpath;		//çˆ¶è·¯å¾„, æ ¹è·¯å¾„ä¸º""
+	string t;			//æ ‡è¯†
+	vector<LocalOp> ops;	//åŒä¸€ç›®å½•ä¸‹çš„æ“ä½œ
 }LocalNotification;
 
 inline void WideToMutilByte(const wstring& _src, string & strRet)
@@ -145,7 +145,7 @@ inline void MutilByteToWide(const string& str, wstring & wstr)
 	MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, (wchar_t*)wstr.c_str(), len);
 }
 
-//×ª»»/ Îª \  
+//è½¬æ¢/ ä¸º \  
 inline BOOL RegularPath(string & path)
 {
 	BOOL ret = FALSE;
@@ -190,8 +190,8 @@ inline BOOL RegularPath(wstring & path)
 }
 
 //filesystem api
-//XXX:Ó¦¸ÃÊÊÅä\ ºÍ/, ¿ÉÒÔµ÷ÓÃ PathRemoveFileSpec
-//ÕâÀïÈ«²¿Ä¬ÈÏ£¬ÒÑ¾­µ÷ÓÃÁËRegularPath£¬·Ö¸ô·ûÊÇ\\, ÕâÑù¼òµ¥Ò»µã
+//XXX:åº”è¯¥é€‚é…\ å’Œ/, å¯ä»¥è°ƒç”¨ PathRemoveFileSpec
+//è¿™é‡Œå…¨éƒ¨é»˜è®¤ï¼Œå·²ç»è°ƒç”¨äº†RegularPathï¼Œåˆ†éš”ç¬¦æ˜¯\\, è¿™æ ·ç®€å•ä¸€ç‚¹
 inline string GetBaseDIR(const string & path, char slash='\\')
 {
 	int loc = path.rfind(slash, path.length());
@@ -211,7 +211,7 @@ inline wstring GetBaseDIR(const wstring & path, wchar_t slash=L'\\')
 	return path.substr(0, loc);
 }
 
-//TODO ÓÃwindows api PathFindFileName(ÓĞÂé·³µÄµØ·½£¬²ÎÊı)
+//TODO ç”¨windows api PathFindFileName(æœ‰éº»çƒ¦çš„åœ°æ–¹ï¼Œå‚æ•°)
 inline string GetFileName(const string & path, char slash='\\')
 {
 	int loc = path.rfind(slash, path.length());
@@ -242,7 +242,7 @@ inline wstring GetFileExt(const wstring & path)
 	return path.substr(loc+1);
 }
 
-//Ë³ĞòÊÇÓÉµ×µ½¶¥
+//é¡ºåºæ˜¯ç”±åº•åˆ°é¡¶
 inline vector<wstring> GetBaseDIRs(wstring path, wchar_t slash=L'\\')
 {
 	vector<wstring> fathers;
@@ -263,7 +263,7 @@ inline DWORD CreateDIRs(const wstring & path, const wstring & base, wchar_t slas
 	if(attr != INVALID_FILE_ATTRIBUTES)
 		if(FILE_ATTRIBUTE_DIRECTORY & attr)
 			return 0;
-		else //ÎªÎÄ¼ş
+		else //ä¸ºæ–‡ä»¶
 			return ERROR_FILE_EXISTS;
 	vector<wstring> fathers = GetBaseDIRs(path);
 	int i = 0,n = fathers.size();
@@ -271,7 +271,7 @@ inline DWORD CreateDIRs(const wstring & path, const wstring & base, wchar_t slas
 	{
 		const wstring & fa = base + L'\\' + fathers[i];
 		attr = ::GetFileAttributes(fa.c_str());
-		if(attr != INVALID_FILE_ATTRIBUTES)	//´æÔÚ
+		if(attr != INVALID_FILE_ATTRIBUTES)	//å­˜åœ¨
 			break;
 	}
 	for(--i; i>=0; i--)
@@ -317,16 +317,16 @@ inline bool hasChildren(const wstring & path, bool filt_hidden=true)
 {
 	WIN32_FIND_DATA findData;
 	CString strTemp;
-	strTemp.Format(_T("%s\\*.*"), path.c_str());	//²éÕÒÖ¸¶¨Ä¿Â¼ÏÂµÄÖ±½ÓµÄËùÓĞÎÄ¼şºÍÄ¿Â¼
+	strTemp.Format(_T("%s\\*.*"), path.c_str());	//æŸ¥æ‰¾æŒ‡å®šç›®å½•ä¸‹çš„ç›´æ¥çš„æ‰€æœ‰æ–‡ä»¶å’Œç›®å½•
 
 	HANDLE hFile = FindFirstFile(strTemp, &findData);
 	if(hFile == INVALID_HANDLE_VALUE)
 		return false;
 	do
 	{
-		if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)//Èç¹ûÊÇÄ¿Â¼
+		if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)//å¦‚æœæ˜¯ç›®å½•
 		{
-			if(findData.cFileName[0] == _T('.'))//ÅÅ³ı.ºÍ..ÎÄ¼ş¼Ğ
+			if(findData.cFileName[0] == _T('.'))//æ’é™¤.å’Œ..æ–‡ä»¶å¤¹
 				continue;
 		}
 		if(filt_hidden && (findData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN))
@@ -402,7 +402,7 @@ inline BOOL CreateHiddenDir(const wstring & dirpath)
 	return TRUE;
 }
 
-//´´½¨officeÎÄµµÎÄ¼ş
+//åˆ›å»ºofficeæ–‡æ¡£æ–‡ä»¶
 int CreateOfficeFile(const wstring & path);
 
 //0:xp 1:win7 2:win8 -1: <xp 
@@ -448,7 +448,7 @@ public:
 	CSLock(
 		 _Inout_ CRITICAL_SECTION& cs,
 		 _In_ bool bInitialLock = true,
-		 _In_ bool bInitialcs = false);	//³õÊ¼»¯£¬µ«ÊÇÎö¹¹²»ÊÍ·Å×ÊÔ´
+		 _In_ bool bInitialcs = false);	//åˆå§‹åŒ–ï¼Œä½†æ˜¯ææ„ä¸é‡Šæ”¾èµ„æº
 	~CSLock() throw();
 	void Lock();
 	void Unlock() throw();

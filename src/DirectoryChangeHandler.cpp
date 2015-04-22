@@ -1,7 +1,7 @@
 #include "DirectoryMonitor.h"
 #include "DirectoryChangeHandler.h"
 
-//ÎªÁËÔÚ³¬Ê±Ê±ºòÉ¾³ıÒ»Ğ©×ÊÔ´£¬²»Ñ¡ÔñºÜ³¤µÄÊ±¼ä
+//ä¸ºäº†åœ¨è¶…æ—¶æ—¶å€™åˆ é™¤ä¸€äº›èµ„æºï¼Œä¸é€‰æ‹©å¾ˆé•¿çš„æ—¶é—´
 #define MAX_SLEEP_TIME 30*60*1000
 
 int DirectoryChangeHandler::_id = 0;
@@ -16,7 +16,7 @@ DirectoryChangeHandler::DirectoryChangeHandler(int typeNum, int threadMax, DWORD
 	m_def_waittime = waittime;
 	//log
 	cout2file();
-	//multi wait ±ØĞëÒªÓĞµÈ´ıµÄhandler
+	//multi wait å¿…é¡»è¦æœ‰ç­‰å¾…çš„handler
 	m_event = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	m_changeHandles[0] = m_event;
 	m_changeArr[0] = NULL;
@@ -39,7 +39,7 @@ void DirectoryChangeHandler::Init()
 		&m_dwThreadId);
 }
 
-//Òì²½APC »áÍ¨ÖªÕâ¸öÏß³Ì£¬µ«ÊÇËü±¾Éí²»ÊÇÕâ¸öÏß³Ì½øĞĞÖ´ĞĞµÄ£¬ÄÇÃ´ËµÕâÀï»¹ÊÇÒª¶àÏß³ÌµÄ±£»¤??
+//å¼‚æ­¥APC ä¼šé€šçŸ¥è¿™ä¸ªçº¿ç¨‹ï¼Œä½†æ˜¯å®ƒæœ¬èº«ä¸æ˜¯è¿™ä¸ªçº¿ç¨‹è¿›è¡Œæ‰§è¡Œçš„ï¼Œé‚£ä¹ˆè¯´è¿™é‡Œè¿˜æ˜¯è¦å¤šçº¿ç¨‹çš„ä¿æŠ¤??
 unsigned int WINAPI DirectoryChangeHandler::WorkThreadProc(LPVOID arg)
 {
 	DirectoryChangeHandler * pf = (DirectoryChangeHandler *)arg;
@@ -47,10 +47,10 @@ unsigned int WINAPI DirectoryChangeHandler::WorkThreadProc(LPVOID arg)
 	last_wait = wait_t;
 	while(pf->m_running)
 	{
-		//pf->m_nHandles ±ØĞë´óÓÚ0, ·ñÔò·µ»Ø WAIT_FAILED
+		//pf->m_nHandles å¿…é¡»å¤§äº0, å¦åˆ™è¿”å› WAIT_FAILED
 		DWORD rc = ::WaitForMultipleObjectsEx(pf->m_nHandles, pf->m_changeHandles, false, wait_t, true);
-		wait_t = last_wait; //ÅÂ±¾Ó¦¸ÃÒ»¸ö×îºóÒ»¸önotifyµÄ´¦ÀíµÈ´ı±»´ò¶ÏÁË
-		if(rc == WAIT_IO_COMPLETION)	//±»Òì²½»½ĞÑ
+		wait_t = last_wait; //æ€•æœ¬åº”è¯¥ä¸€ä¸ªæœ€åä¸€ä¸ªnotifyçš„å¤„ç†ç­‰å¾…è¢«æ‰“æ–­äº†
+		if(rc == WAIT_IO_COMPLETION)	//è¢«å¼‚æ­¥å”¤é†’
 		{
 			//cout << "WAIT_IO_COMPLETION called" << endl;
 			dlog("some APC message notify comed!");
@@ -61,10 +61,10 @@ unsigned int WINAPI DirectoryChangeHandler::WorkThreadProc(LPVOID arg)
 			cout << "wait failed, err code:" << GetLastError() << endl;
 			continue;
 		}
-		//XXX Èç¹û³¬Ê±ºÍÍ¨Öª¶¼±»´¥·¢£¬µ«ÊÇÕâÊ±ºòAPC´ò¶ÏÁË£¬ÄÇÓÅÏÈ¼¶ÊÇtimeout?
-		//Èç¹ûÕâÑù¾ÍÔÙÀ´´Îtimeout=0£¬ÔÙ´¦Àítimeout£¬ÈÃÍ¨ÖªÓĞ»ú»á´¦Àí
+		//XXX å¦‚æœè¶…æ—¶å’Œé€šçŸ¥éƒ½è¢«è§¦å‘ï¼Œä½†æ˜¯è¿™æ—¶å€™APCæ‰“æ–­äº†ï¼Œé‚£ä¼˜å…ˆçº§æ˜¯timeout?
+		//å¦‚æœè¿™æ ·å°±å†æ¥æ¬¡timeout=0ï¼Œå†å¤„ç†timeoutï¼Œè®©é€šçŸ¥æœ‰æœºä¼šå¤„ç†
 		if(rc == WAIT_TIMEOUT) {
-			pf->handle_timeout();	//µÈ´ıµÄÊ±¼äµ½ÁË£¬Í³Ò»´¦Àí
+			pf->handle_timeout();	//ç­‰å¾…çš„æ—¶é—´åˆ°äº†ï¼Œç»Ÿä¸€å¤„ç†
 		} else{
 			rc -= WAIT_OBJECT_0;
 			if(rc == 0) {//note self
@@ -98,7 +98,7 @@ struct _monitor_info{
 	_monitor_info(DirectoryChangeHandler * dc, int id, string type):m_dc(dc), m_id(id), m_type(type){ };
 };
 
-//È¥µô¶ÔÄ³¸öÄ¿Â¼µÄ¼à¿Ø
+//å»æ‰å¯¹æŸä¸ªç›®å½•çš„ç›‘æ§
 BOOL DirectoryChangeHandler::DelDirectory(DirectoryMonitor * monitor)
 {
 	if (!m_hThread)
@@ -110,13 +110,13 @@ BOOL DirectoryChangeHandler::DelDirectory(DirectoryMonitor * monitor)
 	return TRUE;
 }
 
-//½áÊøÈ«²¿¼à¿Ø
+//ç»“æŸå…¨éƒ¨ç›‘æ§
 BOOL DirectoryChangeHandler::Terminate()
 {
 	if (m_hThread)
 	{
 		::QueueUserAPC(DirectoryChangeHandler::TerminateProc, m_hThread, (ULONG_PTR)this);
-		::WaitForSingleObjectEx(m_hThread, 60000, true);	//10s »¹»á³¬Ê±£¡µ¼ÖÂ·ÃÎÊÎŞĞ§µØÖ·£¨Îö¹¹ÁË£©
+		::WaitForSingleObjectEx(m_hThread, 60000, true);	//10s è¿˜ä¼šè¶…æ—¶ï¼å¯¼è‡´è®¿é—®æ— æ•ˆåœ°å€ï¼ˆææ„äº†ï¼‰
 		::CloseHandle(m_hThread);
 		::CloseHandle(m_event);
 		dlog("in DirectoryChangeHandler Terminate(), not delete this!");
@@ -133,7 +133,7 @@ void CALLBACK DirectoryChangeHandler::AddDirectoryProc(__in  ULONG_PTR arg)
 	DirectoryMonitor * monitor = (DirectoryMonitor *) arg;
 	DirectoryChangeHandler * dc = monitor->m_dc;
 	monitor->m_id = dc->_id++;
-	//¼ÓÈëÕâ¸ömonitor
+	//åŠ å…¥è¿™ä¸ªmonitor
 	dc->m_monitors[monitor->m_id] = monitor;
 	map<string, CReadDirectoryChanges*>::iterator it = dc->m_changes.find(monitor->m_type);
 	CReadDirectoryChanges * changes = NULL;
@@ -147,7 +147,7 @@ void CALLBACK DirectoryChangeHandler::AddDirectoryProc(__in  ULONG_PTR arg)
 	}
 	else
 		changes = it->second;
-	//´´½¨Ä¿Â¼¼àÌı
+	//åˆ›å»ºç›®å½•ç›‘å¬
 	changes->AddDirectory(	monitor->m_homew.c_str(), 
 							monitor->m_id,
 							TRUE, ALL_NOTIFY_CHANGE_FLAGS);
@@ -155,7 +155,7 @@ void CALLBACK DirectoryChangeHandler::AddDirectoryProc(__in  ULONG_PTR arg)
 
 void CALLBACK DirectoryChangeHandler::DelDirectoryProc(__in  ULONG_PTR arg)
 {
-	//Õâ¸öÊÇÒì²½µÄ£¬µ«ÊÇmonitorÒÑ¾­ÊÍ·ÅÁË£¬ËùÒÔµØÖ·´íÎó
+	//è¿™ä¸ªæ˜¯å¼‚æ­¥çš„ï¼Œä½†æ˜¯monitorå·²ç»é‡Šæ”¾äº†ï¼Œæ‰€ä»¥åœ°å€é”™è¯¯
 	dlog("in DirectoryChangeHandler::DelDirectoryProc",true);
 	_monitor_info * monitor = (_monitor_info *) arg;
 	DirectoryChangeHandler * dc = monitor->m_dc;
@@ -169,11 +169,11 @@ void CALLBACK DirectoryChangeHandler::DelDirectoryProc(__in  ULONG_PTR arg)
 		bool get = changes->DelDirectory(monitor->m_id);
 		dlog("dc->m_monitors erase DirectoryMonitor");
 		dc->m_monitors.erase(iter);
-		//Ã»ÓĞÉ¾³ı m_changeHandles ºÍ m_changeArr
-		//Ò²¾ÍÊÇËµÕ¼ÁËwait_multiµÄÒ»¸öÎ»ÖÃ£¬Èç¹ûchangesÎª¿ÕÁË
+		//æ²¡æœ‰åˆ é™¤ m_changeHandles å’Œ m_changeArr
+		//ä¹Ÿå°±æ˜¯è¯´å äº†wait_multiçš„ä¸€ä¸ªä½ç½®ï¼Œå¦‚æœchangesä¸ºç©ºäº†
 		if(reqnum == 1 && get)
-		{//Ò²ĞíchangesÖ¸Õë±»ÊÍ·ÅÁË£¬Ã»ÓĞÒıÓÃ¼ÆÊı£¬µ«ÕâÀïÖ»ÊÇÒÆ³öËüµÄÖ¸ÕëºÍÍ¨ÖªÕ¼µÄÎ»ÖÃ
-			//ºÍÌí¼ÓÊÇÄæ¹ı³Ì
+		{//ä¹Ÿè®¸changesæŒ‡é’ˆè¢«é‡Šæ”¾äº†ï¼Œæ²¡æœ‰å¼•ç”¨è®¡æ•°ï¼Œä½†è¿™é‡Œåªæ˜¯ç§»å‡ºå®ƒçš„æŒ‡é’ˆå’Œé€šçŸ¥å çš„ä½ç½®
+			//å’Œæ·»åŠ æ˜¯é€†è¿‡ç¨‹
 			dc->m_changes.erase(monitor->m_type);
 			for(unsigned int i=0; i < dc->m_nHandles; i++)
 			{
@@ -213,11 +213,11 @@ void DirectoryChangeHandler::handle_timeout()
 		 it != m_monitors.end(); ++it)
 	{
 		cnt += it->second->SendNotify();
-		cnt += it->second->ClearBlacklist();	//ÇåÀíºÚÃûµ¥
+		cnt += it->second->ClearBlacklist();	//æ¸…ç†é»‘åå•
 		if(m_waittime == MAX_SLEEP_TIME)
 			it->second->release_resource();
 	}
-	//Èç¹ûÕâ´ÎtimeoutÓĞÒª´¦ÀíµÄ£¬ÄÇÃ´¼ÌĞøµÈtimeout£¬Èç¹ûÃ»ÓĞ²»ÓÃtimeout
+	//å¦‚æœè¿™æ¬¡timeoutæœ‰è¦å¤„ç†çš„ï¼Œé‚£ä¹ˆç»§ç»­ç­‰timeoutï¼Œå¦‚æœæ²¡æœ‰ä¸ç”¨timeout
 	m_waittime = cnt > 0 ? m_def_waittime : MAX_SLEEP_TIME;
 }
 
@@ -226,7 +226,7 @@ void DirectoryChangeHandler::handle_notify(int index)
 	dlog("in DirectoryChangeHandler::handle_notify", true);
 	CReadDirectoryChanges * changes = m_changeArr[index];
 	list<TDirectoryChangeNotification> li;
-	//´Ó¸÷×ÔµÄÍ¨ÖªÁĞ±íÀïÈ¡³öËùÓĞÍ¨Öª
+	//ä»å„è‡ªçš„é€šçŸ¥åˆ—è¡¨é‡Œå–å‡ºæ‰€æœ‰é€šçŸ¥
 	changes->PopAll(li);
 
 	typedef list<TDirectoryChangeNotification>::iterator iter_t;

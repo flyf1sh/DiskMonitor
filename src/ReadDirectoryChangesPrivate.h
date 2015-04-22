@@ -15,10 +15,10 @@ class CReadChangesServer;
 
 // All functions in CReadChangesRequest run in the context of the worker thread.
 // One instance of this object is created for each call to AddDirectory().
-// Õâ¸örequest°´ÕÕÎÒÃÇµÄÒ»°ãµÄÇé¿öÒ»¸ö¾Í¿ÉÒÔÁË£¬µ«ÊÇÃ»·¨Çø·ÖÎÄ¼ş¼ĞºÍÎÄ¼ş
-// ËùÒÔÎÒÏòÏµÍ³×¢²áÁ½¸ö»Øµ÷£¬Ò»¸öÎÄ¼ş¼ĞµÄÑ¡Ïî£¬Ò»¸öÎÄ¼şÑ¡Ïî£¬ÕâÑùÀ´·ÖÀë£»
-// *** µ«ÊÇ£¬ÕâÑùËäÈ»¿ÉÒÔ·ÖÀëÎÄ¼ş¼ĞºÍÎÄ¼şµÄÑ¡Ïî£¬µ«ÊÇ´òÂÒÁËÓĞ¹æÂÉµÄË³Ğò£¬ÈÃÑ°ÕÒÄ£Ê½À§ÄÑÌ«¶à
-// *** ËùÒÔÎÒ·ÅÆú£¬»¹ÊÇºÏÎªÒ»¸ö¼àÌı£¬ÓÃÉÏ²ãÀ´¼ÇÂ¼ÎÄ¼ş¼ĞµÄ¼ÇÂ¼£¨ÆäÊµ¾ÍÊÇÉ¾³ıÊ±ºòÃ»·¨¼ø±ğÀàĞÍ£©
+// è¿™ä¸ªrequestæŒ‰ç…§æˆ‘ä»¬çš„ä¸€èˆ¬çš„æƒ…å†µä¸€ä¸ªå°±å¯ä»¥äº†ï¼Œä½†æ˜¯æ²¡æ³•åŒºåˆ†æ–‡ä»¶å¤¹å’Œæ–‡ä»¶
+// æ‰€ä»¥æˆ‘å‘ç³»ç»Ÿæ³¨å†Œä¸¤ä¸ªå›è°ƒï¼Œä¸€ä¸ªæ–‡ä»¶å¤¹çš„é€‰é¡¹ï¼Œä¸€ä¸ªæ–‡ä»¶é€‰é¡¹ï¼Œè¿™æ ·æ¥åˆ†ç¦»ï¼›
+// *** ä½†æ˜¯ï¼Œè¿™æ ·è™½ç„¶å¯ä»¥åˆ†ç¦»æ–‡ä»¶å¤¹å’Œæ–‡ä»¶çš„é€‰é¡¹ï¼Œä½†æ˜¯æ‰“ä¹±äº†æœ‰è§„å¾‹çš„é¡ºåºï¼Œè®©å¯»æ‰¾æ¨¡å¼å›°éš¾å¤ªå¤š
+// *** æ‰€ä»¥æˆ‘æ”¾å¼ƒï¼Œè¿˜æ˜¯åˆä¸ºä¸€ä¸ªç›‘å¬ï¼Œç”¨ä¸Šå±‚æ¥è®°å½•æ–‡ä»¶å¤¹çš„è®°å½•ï¼ˆå…¶å®å°±æ˜¯åˆ é™¤æ—¶å€™æ²¡æ³•é‰´åˆ«ç±»å‹ï¼‰
 class CReadChangesRequest
 {
 public:
@@ -31,10 +31,10 @@ public:
 	void BeginRead();
 
 	// The dwSize is the actual number of bytes sent to the APC.
-	// TODO: ÔÙÓÃÒ»¸öÏß³ÌÀ´´¦Àí½á¹û£¬ÕâÀïÓÃswap (new: ²»ÓÃÏß³Ì)
+	// TODO: å†ç”¨ä¸€ä¸ªçº¿ç¨‹æ¥å¤„ç†ç»“æœï¼Œè¿™é‡Œç”¨swap (new: ä¸ç”¨çº¿ç¨‹)
 	void BackupBuffer(DWORD dwSize)
 	{
-		//ÕâÀïÒ²ËµÁË¿ÉÒÔ¼òµ¥µÄ½»»»¾Í¿ÉÒÔÁË
+		//è¿™é‡Œä¹Ÿè¯´äº†å¯ä»¥ç®€å•çš„äº¤æ¢å°±å¯ä»¥äº†
 		// We could just swap back and forth between the two
 		// buffers, but this code is easier to understand and debug.
 		//memcpy(&m_BackupBuffer[0], &m_Buffer[0], dwSize);
@@ -43,7 +43,7 @@ public:
 
 	void ProcessNotification();
 
-	//½áÊøÄ¿Â¼µÄ¼à¿Ø
+	//ç»“æŸç›®å½•çš„ç›‘æ§
 	void RequestTermination()
 	{
 		if(m_hDirectory == NULL)
@@ -51,7 +51,7 @@ public:
 		HANDLE h = m_hDirectory;
 		m_hDirectory = nullptr;
 		dlog("RequestTermination cancelIo");
-		::CancelIo(h);	//»á´¥·¢APC»Øµ÷
+		::CancelIo(h);	//ä¼šè§¦å‘APCå›è°ƒ
 		::CloseHandle(h);
 		dlog("RequestTermination cancelIo end");
 	}
@@ -74,7 +74,7 @@ public:
 		return m_ref;
 	}
 
-	//ÔÚapc½Óµ½Õâ¸öreq½áÊøºó£¬ÇåÀíÒÑ¾­ÊÕµ½µÄÏûÏ¢£¬ÕâÑùÍâ²¿ÏûÏ¢²¿·Ö²»ÓÃµ£ĞÄÕÒ²»µ½Í¨ÖªÔ´
+	//åœ¨apcæ¥åˆ°è¿™ä¸ªreqç»“æŸåï¼Œæ¸…ç†å·²ç»æ”¶åˆ°çš„æ¶ˆæ¯ï¼Œè¿™æ ·å¤–éƒ¨æ¶ˆæ¯éƒ¨åˆ†ä¸ç”¨æ‹…å¿ƒæ‰¾ä¸åˆ°é€šçŸ¥æº
 	void clear_self();
 
 	CReadChangesServer* m_pServer;
@@ -104,15 +104,15 @@ protected:
 	// be aligned as required by ReadDirectoryChangesW().
 	vector<BYTE> m_Buffer;
 
-	// Ë«buffer
+	// åŒbuffer
 	// Double buffer strategy so that we can issue a new read
 	// request before we process the current buffer.
 	vector<BYTE> m_BackupBuffer;
 	
-	//ÓÃÓÚ¶àÏß³Ì±£»¤
+	//ç”¨äºå¤šçº¿ç¨‹ä¿æŠ¤
 	volatile DWORD m_ref;
 
-	WORD m_ftype;	//¼à¿ØµÄÀàĞÍ¡£0 dir; 1 file; 2 dir/file
+	WORD m_ftype;	//ç›‘æ§çš„ç±»å‹ã€‚0 dir; 1 file; 2 dir/file
 };
 
 // All functions in CReadChangesServer run in the context of the worker thread.
@@ -121,8 +121,8 @@ protected:
 // the various C++ member functions with C-style Win32 functions.
 
 /*
- *	ÊôÓÚÒ»¸öchangesÀà£¬¸ÃÀàµÄÊµÀı°ó¶¨µ½Ò»¸öÏß³ÌÉÏ,
- *	server¿ÉÒÔÓÃÀ´¹ÜÀí¶à¸örequest£¨½øĞĞÁËbindµÄÄ¿Â¼£©
+ *	å±äºä¸€ä¸ªchangesç±»ï¼Œè¯¥ç±»çš„å®ä¾‹ç»‘å®šåˆ°ä¸€ä¸ªçº¿ç¨‹ä¸Š,
+ *	serverå¯ä»¥ç”¨æ¥ç®¡ç†å¤šä¸ªrequestï¼ˆè¿›è¡Œäº†bindçš„ç›®å½•ï¼‰
  */
 class CReadChangesServer
 {
@@ -164,7 +164,7 @@ public:
 
 	CReadDirectoryChanges* m_pBase;
 
-	//Í¶Èë½øÀ´µÄÇëÇóÊıÁ¿
+	//æŠ•å…¥è¿›æ¥çš„è¯·æ±‚æ•°é‡
 	volatile DWORD m_nOutstandingRequests;
 protected:
 	void Run();
@@ -200,11 +200,11 @@ protected:
 
 	void RequestTermination()
 	{
-		m_bTerminate = true;	//½áÊøÏß³Ì
+		m_bTerminate = true;	//ç»“æŸçº¿ç¨‹
 		for (DWORD i=0; i<m_pBlocks.size(); ++i)
 		{
 			// Each Request object will delete itself.
-			m_pBlocks[i]->put();	//ÉÏ²ãÃ»ÓĞÊÍ·ÅÒıÓÃ
+			m_pBlocks[i]->put();	//ä¸Šå±‚æ²¡æœ‰é‡Šæ”¾å¼•ç”¨
 			m_pBlocks[i]->RequestTermination();
 		}
 		m_pBlocks.clear();

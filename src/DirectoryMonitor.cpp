@@ -11,7 +11,7 @@ using namespace std;
 
 #define MAX_CACHE_SIZE 10000
 #define BLACKLIST_CLEAR_FREQUENCY 1
-//±íÊ¾timeout´¦ÀíµÄÉÏÏŞ´ÎÊı
+//è¡¨ç¤ºtimeoutå¤„ç†çš„ä¸Šé™æ¬¡æ•°
 #define BLACKLIST_CLEAR_UPBOUND 5
 
 
@@ -85,7 +85,7 @@ public:
 		const BlacklistItem & item = BlacklistItem(act, path, path2);
 		return QueryList(item, ClearWhenHit, m_blist) || QueryList(item, ClearWhenHit, m_blist_gen2);
 	}
-	//timeout Ê±ºòµ÷ÓÃ£¬¿ÉÒÔ¿ØÖÆÆµÂÊ
+	//timeout æ—¶å€™è°ƒç”¨ï¼Œå¯ä»¥æ§åˆ¶é¢‘ç‡
 	void Clear()
 	{
 		if(++m_nclear != BLACKLIST_CLEAR_FREQUENCY)
@@ -103,13 +103,13 @@ public:
 		m_blist.swap(m_blist_gen2);
 	}
 private:
-	//²ÉÈ¡Ë«×ÊÔ´Ä£Ê½, ÕâÑù¿ÉÒÔÓĞĞ§µÄÇåÀíold ÇëÇó, ÁíÒ»¸öÔ­ÒòÊÇ
-	//timeout´¦ÀíÏß³ÌÊÇÁíÒ»¸öÏß³Ì£¬²»ÖªµÀËüµ÷ÓÃµÄÖÜÆÚ£¬ËùÒÔ¿ÉÄÜ¸Õ¸Õ
-	//ÉèÖÃ¾ÍÓĞ¿ÉÄÜ±»Clear(),ËùÒÔÕâÀï¾ÍÌá¹©ÁËÖÁÉÙÒ»¸öÖÜÆÚµÄ»º³åÊ±¼ä
+	//é‡‡å–åŒèµ„æºæ¨¡å¼, è¿™æ ·å¯ä»¥æœ‰æ•ˆçš„æ¸…ç†old è¯·æ±‚, å¦ä¸€ä¸ªåŸå› æ˜¯
+	//timeoutå¤„ç†çº¿ç¨‹æ˜¯å¦ä¸€ä¸ªçº¿ç¨‹ï¼Œä¸çŸ¥é“å®ƒè°ƒç”¨çš„å‘¨æœŸï¼Œæ‰€ä»¥å¯èƒ½åˆšåˆš
+	//è®¾ç½®å°±æœ‰å¯èƒ½è¢«Clear(),æ‰€ä»¥è¿™é‡Œå°±æä¾›äº†è‡³å°‘ä¸€ä¸ªå‘¨æœŸçš„ç¼“å†²æ—¶é—´
 	set<item_type > m_blist;
 	set<item_type > m_blist_gen2;
 	CRITICAL_SECTION m_guard;
-	int m_nclear;	//clearµÄÖÜÆÚÀÛ¼Æ´ÎÊı£¬ÓÃÀ´¿ØÖÆÃûµ¥µÄÊÙÃü
+	int m_nclear;	//clearçš„å‘¨æœŸç´¯è®¡æ¬¡æ•°ï¼Œç”¨æ¥æ§åˆ¶åå•çš„å¯¿å‘½
 private:
 	bool QueryList(const item_type & item, bool ClearWhenHit, set<item_type > & bl)
 	{
@@ -185,7 +185,7 @@ public:
 		}
 		return true;
 	}
-	//timeout Ê±ºòµ÷ÓÃ
+	//timeout æ—¶å€™è°ƒç”¨
 	int Clear()
 	{
 		CSLock lock(m_guard);
@@ -239,10 +239,10 @@ public:
 	{
 		DWORD attr = ::GetFileAttributes(thread_dir.c_str());
 		bool creat_thread_dir = false;
-		if( INVALID_FILE_ATTRIBUTES == attr )//²»´æÔÚ
+		if( INVALID_FILE_ATTRIBUTES == attr )//ä¸å­˜åœ¨
 			creat_thread_dir = true;
 		else if(!(FILE_ATTRIBUTE_DIRECTORY & attr))
-		{//ÎÄ¼ş£¬É¾³ı
+		{//æ–‡ä»¶ï¼Œåˆ é™¤
 			::DeleteFile(thread_dir.c_str());
 			creat_thread_dir = true;
 		}
@@ -269,31 +269,31 @@ public:
 		bool isOfficefile = isOffice(wstr_from);
 		wstring wstr_to_full;
 
-		//¶ÔÓÚÕâĞ©²Ù×÷£¬ÓÉÓÚ¶àÏß³ÌµÄ¹ØÏµ£¬ÎÒÃÇÓ¦¸Ã·ÀÖ¹ÖØÃûÎÄ¼şµÄ³åÍ»
-		//ÄÇ¿ÉÒÔ¸ù¾İÏß³Ìid£¬´´½¨ÎÄ¼ş¼Ğ£¬Õâ¸öÏß³ÌµÄ²Ù×÷¶¼ÔÚÕâ¸öÎÄ¼ş¼ĞÀï
+		//å¯¹äºè¿™äº›æ“ä½œï¼Œç”±äºå¤šçº¿ç¨‹çš„å…³ç³»ï¼Œæˆ‘ä»¬åº”è¯¥é˜²æ­¢é‡åæ–‡ä»¶çš„å†²çª
+		//é‚£å¯ä»¥æ ¹æ®çº¿ç¨‹idï¼Œåˆ›å»ºæ–‡ä»¶å¤¹ï¼Œè¿™ä¸ªçº¿ç¨‹çš„æ“ä½œéƒ½åœ¨è¿™ä¸ªæ–‡ä»¶å¤¹é‡Œ
 
-		//ÏÈÕÒµ½¶ÔÓ¦Ïß³ÌidµÄÄ¿Â¼
+		//å…ˆæ‰¾åˆ°å¯¹åº”çº¿ç¨‹idçš„ç›®å½•
 		wstring thread_dir = GetThreadTempdir(homew);
 		if(err = CreateThreadTempdir(thread_dir))
 			return err;
 
-		//¶ÔÓÚÒÆ¶¯²Ù×÷,Èç¹ûÊÇÎÄ¼ş£¬Ä¿±êµØÖ·Èç¹û²»´æÔÚ£¬½¨ÖĞ¼äÎÄ¼ş¼Ğ£¬£¨²»Í¬Ãû¸ÄÃû£©ÒÆ¶¯µ½¶ÔÓ¦Î»ÖÃ
-		//Èç¹û¶ÔÓ¦Î»ÖÃÓĞÎÄ¼ş£¬¸²¸Ç£¬Èç¹û¶ÔÓ¦µØÖ·ÓĞÍ¬ÃûÎÄ¼ş¼Ğ, ÒÆ¶¯µ½¸ÃÎÄ¼ş¼ĞÏÂ¡£
-		//¶ÔÓÚÄ¿Â¼µÄ¹æÔòºÍÎÄ¼şÒ»Ñù£¬Ä¿±êµØÖ·Èç¹û²»´æÔÚ£¬½¨ÖĞ¼äÎÄ¼ş¼Ğ£¬£¨²»Í¬Ãû¸ÄÃû£©ÒÆ¶¯µ½¶ÔÓ¦Î»ÖÃ
-		//ÏÖÔÚÄ¿±êµØÖ·´æÔÚ,µ±×ö¸¸Â·¾¶´¦Àí£¬Èç¹ûÊÇÄ¿Â¼£¬ÒÆ¶¯µ½Õâ¸öÄ¿Â¼ÏÂ£¬Èç¹ûÄ¿Â¼ÏÂÓĞÍ¬ÃûÄ¿Â¼£¬ºÏ²¢£¬ÓĞÍ¬ÃûÎÄ¼ş£¬±¨´í126£»
-		//Èç¹û´æÔÚµÄÊÇÎÄ¼ş,±¨´í 126
-		//(ÕâÃ´Ëµ£¬Ê×ÏÈÕâ¸öTOµØÖ·£¬Èç¹ûÊÇ´æÔÚµÄÄ¿Â¼£¬ÄÇÃ´ÒÆ¶¯µ½¸ÄÄ¿Â¼ÏÂ£¬Èç¹ûÄ¿Â¼ÏÂÓĞÍ¬ÃûµÄ³åÍ»--²»Í¬Àà£¬ÄÇÃ´±¨´í, Èç¹ûÍ¬Àà¾Í¸²¸Ç¡£
-		//Èç¹û´æÔÚµÄÊÇÎÄ¼ş£¬ÄÇÃ´ÒÆ¶¯ÎÄ¼ş¾ÍÊÇ¸²¸Ç£¬ÒÆ¶¯Ä¿Â¼¾ÍÊÇ±¨´í¡£Èç¹ûTOµØÖ·²»´æÔÚ£¬ÄÇÃ´¶¼µ±ÒÆ¶¯¸ÄÃû´¦Àí)
+		//å¯¹äºç§»åŠ¨æ“ä½œ,å¦‚æœæ˜¯æ–‡ä»¶ï¼Œç›®æ ‡åœ°å€å¦‚æœä¸å­˜åœ¨ï¼Œå»ºä¸­é—´æ–‡ä»¶å¤¹ï¼Œï¼ˆä¸åŒåæ”¹åï¼‰ç§»åŠ¨åˆ°å¯¹åº”ä½ç½®
+		//å¦‚æœå¯¹åº”ä½ç½®æœ‰æ–‡ä»¶ï¼Œè¦†ç›–ï¼Œå¦‚æœå¯¹åº”åœ°å€æœ‰åŒåæ–‡ä»¶å¤¹, ç§»åŠ¨åˆ°è¯¥æ–‡ä»¶å¤¹ä¸‹ã€‚
+		//å¯¹äºç›®å½•çš„è§„åˆ™å’Œæ–‡ä»¶ä¸€æ ·ï¼Œç›®æ ‡åœ°å€å¦‚æœä¸å­˜åœ¨ï¼Œå»ºä¸­é—´æ–‡ä»¶å¤¹ï¼Œï¼ˆä¸åŒåæ”¹åï¼‰ç§»åŠ¨åˆ°å¯¹åº”ä½ç½®
+		//ç°åœ¨ç›®æ ‡åœ°å€å­˜åœ¨,å½“åšçˆ¶è·¯å¾„å¤„ç†ï¼Œå¦‚æœæ˜¯ç›®å½•ï¼Œç§»åŠ¨åˆ°è¿™ä¸ªç›®å½•ä¸‹ï¼Œå¦‚æœç›®å½•ä¸‹æœ‰åŒåç›®å½•ï¼Œåˆå¹¶ï¼Œæœ‰åŒåæ–‡ä»¶ï¼ŒæŠ¥é”™126ï¼›
+		//å¦‚æœå­˜åœ¨çš„æ˜¯æ–‡ä»¶,æŠ¥é”™ 126
+		//(è¿™ä¹ˆè¯´ï¼Œé¦–å…ˆè¿™ä¸ªTOåœ°å€ï¼Œå¦‚æœæ˜¯å­˜åœ¨çš„ç›®å½•ï¼Œé‚£ä¹ˆç§»åŠ¨åˆ°æ”¹ç›®å½•ä¸‹ï¼Œå¦‚æœç›®å½•ä¸‹æœ‰åŒåçš„å†²çª--ä¸åŒç±»ï¼Œé‚£ä¹ˆæŠ¥é”™, å¦‚æœåŒç±»å°±è¦†ç›–ã€‚
+		//å¦‚æœå­˜åœ¨çš„æ˜¯æ–‡ä»¶ï¼Œé‚£ä¹ˆç§»åŠ¨æ–‡ä»¶å°±æ˜¯è¦†ç›–ï¼Œç§»åŠ¨ç›®å½•å°±æ˜¯æŠ¥é”™ã€‚å¦‚æœTOåœ°å€ä¸å­˜åœ¨ï¼Œé‚£ä¹ˆéƒ½å½“ç§»åŠ¨æ”¹åå¤„ç†)
 		SHFILEOPSTRUCT FileOp; 
 		ZeroMemory((void*)&FileOp,sizeof(SHFILEOPSTRUCT));
-		//ÕâÀï¿ÉÄÜ»á±»¿¨×¡£¬ÒòÎªÓÉÓÚÃ»ÓĞ³ö´íµÄUIĞÅÏ¢£¬¿ÉÄÜ»áÕÕ³É»ìÂÒ£¬»¹ÊÇÒªÓÃ FOF_NO_UI
-		FileOp.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR;	//FOF_NOCONFIRMMKDIR Õâ¸öÓĞ×÷ÓÃ£¿
+		//è¿™é‡Œå¯èƒ½ä¼šè¢«å¡ä½ï¼Œå› ä¸ºç”±äºæ²¡æœ‰å‡ºé”™çš„UIä¿¡æ¯ï¼Œå¯èƒ½ä¼šç…§æˆæ··ä¹±ï¼Œè¿˜æ˜¯è¦ç”¨ FOF_NO_UI
+		FileOp.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR;	//FOF_NOCONFIRMMKDIR è¿™ä¸ªæœ‰ä½œç”¨ï¼Ÿ
 		FileOp.fFlags = FOF_NO_UI;
 
 
 
-		//µÚÒ»²½£ºÔ¤ÏÈ´¦Àí, Ò»°ãÊÇÒÆÈëµ½Òş²ØÄ¿Â¼Àï
-		//XXX ÔÚÒÆÈëµÄÊ±ºòÖ±½Ó¸ÄÃû, µ«ÊÇ×¢ÒâÄÚ²¿µÄÇé¿ö
+		//ç¬¬ä¸€æ­¥ï¼šé¢„å…ˆå¤„ç†, ä¸€èˆ¬æ˜¯ç§»å…¥åˆ°éšè—ç›®å½•é‡Œ
+		//XXX åœ¨ç§»å…¥çš„æ—¶å€™ç›´æ¥æ”¹å, ä½†æ˜¯æ³¨æ„å†…éƒ¨çš„æƒ…å†µ
 		step = 1;
 		bool inner_moverename = false;
 		if(!isAbsPath && wstr_to_name != wstr_from_name)
@@ -306,7 +306,7 @@ public:
 		if(attr != INVALID_FILE_ATTRIBUTES && FILE_ATTRIBUTE_DIRECTORY & attr)
 			isfile = false;
 		if(file_exists(inner_path.c_str()))
-		{//É¾³ı
+		{//åˆ é™¤
 			FileOp.pFrom = inner_path.c_str();
 			FileOp.wFunc = FO_DELETE; 
 			::SHFileOperation(&FileOp);
@@ -314,24 +314,24 @@ public:
 
 		switch(act)
 		{
-		case 1:	//ĞÂÔöÎÄ¼ş
+		case 1:	//æ–°å¢æ–‡ä»¶
 			break;
-		case 2:	//ĞÂÔöÎÄ¼ş¼Ğ
+		case 2:	//æ–°å¢æ–‡ä»¶å¤¹
 			isfile = false;
 			if(attr != INVALID_FILE_ATTRIBUTES)
 				if(FILE_ATTRIBUTE_DIRECTORY & attr)
 					return 0;
-				else //ÎªÎÄ¼ş
+				else //ä¸ºæ–‡ä»¶
 					return ERROR_FILE_EXISTS;
 			break;
-		case 0:	//É¾³ı
-		case 3:	//ÒÆ¶¯
-		case 4:	//¸ÄÃû
-		case 5:	//¿½±´
+		case 0:	//åˆ é™¤
+		case 3:	//ç§»åŠ¨
+		case 4:	//æ”¹å
+		case 5:	//æ‹·è´
 			if(attr == INVALID_FILE_ATTRIBUTES)
 				return ERROR_FILE_EXISTS;
 			FileOp.pFrom = wstr_from_full.c_str(); 
-			FileOp.pTo = inner_path.c_str();	//ÒÆ¶¯£¬¸½´øÁËÖØÃüÃû
+			FileOp.pTo = inner_path.c_str();	//ç§»åŠ¨ï¼Œé™„å¸¦äº†é‡å‘½å
 			FileOp.wFunc = act==5?FO_COPY:FO_MOVE; 
 			err = ::SHFileOperation(&FileOp);
 			if(err) goto fail;
@@ -339,21 +339,21 @@ public:
 		}
 
 		step = 2;
-		//µÚ¶ş²½£º×ö´¦Àí 
+		//ç¬¬äºŒæ­¥ï¼šåšå¤„ç† 
 		switch(act)
 		{
-		case 0:	//É¾³ı	
+		case 0:	//åˆ é™¤	
 			FileOp.pFrom = inner_path.c_str();
 			FileOp.wFunc = FO_DELETE; 
-			if(flag & FOP_RECYCLE) //»ØÊÕÕ¾
+			if(flag & FOP_RECYCLE) //å›æ”¶ç«™
 				FileOp.fFlags |= FOF_ALLOWUNDO; 
 			err = ::SHFileOperation(&FileOp);
 			FileOp.fFlags &= ~FOF_ALLOWUNDO; 
 			break;
-		case 1:	//ĞÂÔöÎÄ¼ş
+		case 1:	//æ–°å¢æ–‡ä»¶
 			if(isOfficefile)
 			{
-				err = CreateOfficeFile(inner_path.c_str()); //²»ÄÜÖ±½ÓÓÃinner_path, ÒòÎªÄ©Î²¶àÁË¸ö\0
+				err = CreateOfficeFile(inner_path.c_str()); //ä¸èƒ½ç›´æ¥ç”¨inner_path, å› ä¸ºæœ«å°¾å¤šäº†ä¸ª\0
 			}
 			else
 			{
@@ -373,15 +373,15 @@ public:
 					CloseHandle(filehd);
 			}
 			break;
-		case 2:	//ĞÂÔöÎÄ¼ş¼Ğ
+		case 2:	//æ–°å¢æ–‡ä»¶å¤¹
 			if(!::CreateDirectory(inner_path.c_str(), NULL))
 				err = GetLastError();
 			break;
-		case 3:	//ÒÆ¶¯
-		case 5:	//¿½±´
+		case 3:	//ç§»åŠ¨
+		case 5:	//æ‹·è´
 			if(!inner_moverename)
 				break;
-		case 4:	//¸ÄÃû
+		case 4:	//æ”¹å
 			inner_path2 = thread_dir + L'\\' + wstr_to_name + L'\0';
 			FileOp.pFrom = inner_path.c_str();
 			FileOp.pTo = inner_path2.c_str();
@@ -392,23 +392,23 @@ public:
 		}
 		if(err) goto fail;
 
-		//µÚÈı²½£ººóĞø´¦Àí£¬ÒÆ³ö
+		//ç¬¬ä¸‰æ­¥ï¼šåç»­å¤„ç†ï¼Œç§»å‡º
 		step = 3;
 		switch(act)
 		{
-		case 0:	//É¾³ı
+		case 0:	//åˆ é™¤
 			break;
-		case 1:	//ĞÂÔöÎÄ¼ş
-		case 2:	//ĞÂÔöÎÄ¼ş¼Ğ
+		case 1:	//æ–°å¢æ–‡ä»¶
+		case 2:	//æ–°å¢æ–‡ä»¶å¤¹
 			assert(wstr_to.empty());
-		case 3:	//ÒÆ¶¯
-		case 4:	//¸ÄÃû
-		case 5:	//¿½±´
+		case 3:	//ç§»åŠ¨
+		case 4:	//æ”¹å
+		case 5:	//æ‹·è´
 			wstr_to_full = homew + L'\\' + (wstr_to.empty() ? wstr_from : wstr_to) + L'\0';
 			if(!isfile)
 			{
 				if((flag & (FOP_REPLACE | FOP_IGNORE_EXIST)) && file_exists(wstr_to_full.c_str()))
-				{//É¾³ıoldÄ¿Â¼
+				{//åˆ é™¤oldç›®å½•
 					inner_path2 = thread_dir + L"\\tmp\\" + L'\0';
 					FileOp.pFrom = wstr_to_full.c_str(); 
 					FileOp.pTo = inner_path2.c_str();
@@ -422,16 +422,16 @@ public:
 					err = ::SHFileOperation(&FileOp);
 					if(err) goto fail;
 				}
-				//ÒÆ¶¯ºÍ¿½±´ĞèÒªÊÇ¸¸Â·¾¶´æÔÚ
+				//ç§»åŠ¨å’Œæ‹·è´éœ€è¦æ˜¯çˆ¶è·¯å¾„å­˜åœ¨
 				if(file_exists(GetBaseDIR(wstr_to_full)))
 					wstr_to_full = GetBaseDIR(wstr_to_full) + L'\0';	
 			}
 			else
-			{//ËäÈ»¿ÉÄÜÅöµ½ topathÕâÀïÓĞ¸öÍ¬ÃûµÄÄ¿Â¼£¬µ¼ÖÂÒÆ¶¯µ½Õâ¸öÄ¿Â¼ÏÂÁË
-				//µ«ÊÇÎÒÃÇÏàĞÅµ÷ÓÃÕß»áÅĞ¶ÏÕâ¸ö³åÍ»£¬Òª²»ÎÒÔõÃ´°ì£¿É¾³ıÕâ¸öÄ¿Â¼£¿
+			{//è™½ç„¶å¯èƒ½ç¢°åˆ° topathè¿™é‡Œæœ‰ä¸ªåŒåçš„ç›®å½•ï¼Œå¯¼è‡´ç§»åŠ¨åˆ°è¿™ä¸ªç›®å½•ä¸‹äº†
+				//ä½†æ˜¯æˆ‘ä»¬ç›¸ä¿¡è°ƒç”¨è€…ä¼šåˆ¤æ–­è¿™ä¸ªå†²çªï¼Œè¦ä¸æˆ‘æ€ä¹ˆåŠï¼Ÿåˆ é™¤è¿™ä¸ªç›®å½•ï¼Ÿ
 				if(isXP && file_exists(wstr_to_full.c_str()))
-				{//xpÏÂ¸²¸ÇÍ¬ÃûÎÄ¼ş»áÏÈ´¥·¢É¾³ıÎÄ¼şÏûÏ¢
-					//TODO ÔÚÏûÏ¢¹ıÂËÊ±ºò¿¼ÂÇ¹ıÂËµô
+				{//xpä¸‹è¦†ç›–åŒåæ–‡ä»¶ä¼šå…ˆè§¦å‘åˆ é™¤æ–‡ä»¶æ¶ˆæ¯
+					//TODO åœ¨æ¶ˆæ¯è¿‡æ»¤æ—¶å€™è€ƒè™‘è¿‡æ»¤æ‰
 					inner_path2 = thread_dir + L"\\tmp\\" + wstr_to_name + L'\0';
 					FileOp.pFrom = wstr_to_full.c_str(); 
 					FileOp.pTo = inner_path2.c_str();
@@ -453,7 +453,7 @@ public:
 		}
 		if(err == 0) return 0;
 
-fail:	//FIXME Ã»ÓĞÍêÈ«µÄÄæ¹ı³Ì
+fail:	//FIXME æ²¡æœ‰å®Œå…¨çš„é€†è¿‡ç¨‹
 		if(!inner_path.empty() && file_exists(inner_path.c_str()))
 		{
 			FileOp.pFrom = inner_path.c_str();
@@ -472,7 +472,7 @@ DirectoryMonitor::DirectoryMonitor(DirectoryChangeHandler * dc,
 	m_guess_cnt(0), m_showfilt(false)
 {
 	MutilByteToWide(m_home, m_homew);
-	//TODO:¶¯Ì¬Éú³ÉÆÁ±ÎÄ¿Â¼
+	//TODO:åŠ¨æ€ç”Ÿæˆå±è”½ç›®å½•
 	m_silent_dir = TEMP_DIRNAMEW;
 	CreateHiddenDir(m_homew + L'\\' + m_silent_dir);
 	m_running = m_dc->AddDirectory(this)?1:-1;
@@ -495,7 +495,7 @@ int DirectoryMonitor::Terminate()
 		m_running = -1;
 		m_dc->DelDirectory(this);	
 
-		//XXX clear hidden dir¡£ ·Åµ½Òì²½Ïß³ÌÖĞÈ¥£¿£¿
+		//XXX clear hidden dirã€‚ æ”¾åˆ°å¼‚æ­¥çº¿ç¨‹ä¸­å»ï¼Ÿï¼Ÿ
 		SHFILEOPSTRUCT FileOp; 
 		ZeroMemory((void*)&FileOp,sizeof(SHFILEOPSTRUCT));
 		wstring hidden_dir = m_homew + L'\\' + m_silent_dir + L'\0';
@@ -544,7 +544,7 @@ DWORD DirectoryMonitor::DoActWithoutNotify2(int act, const string & from, const 
 	if(isAbsPath)
 	{
 		assert(act == 3 || act == 5);
-		wstr_from_full = wstr_from + L'\0';		//XXX ±ØĞëÕâÀï¼Ó\0£¬²»ÄÜÓÃÁÙÊ±±äÁ¿
+		wstr_from_full = wstr_from + L'\0';		//XXX å¿…é¡»è¿™é‡ŒåŠ \0ï¼Œä¸èƒ½ç”¨ä¸´æ—¶å˜é‡
 	}
 	else
 		wstr_from_full = m_homew + L'\\' + wstr_from + L'\0';
@@ -562,30 +562,30 @@ DWORD DirectoryMonitor::DoActWithoutNotify2(int act, const string & from, const 
 }
 
 
-/* windows API ²Ù×÷¹æÔò
+/* windows API æ“ä½œè§„åˆ™
  *
- * ¶ÔÓÚÒÆ¶¯²Ù×÷,Èç¹ûÊÇÎÄ¼ş£¬Ä¿±êµØÖ·Èç¹û²»´æÔÚ£¬½¨ÖĞ¼äÎÄ¼ş¼Ğ£¬£¨²»Í¬Ãû¸ÄÃû£©ÒÆ¶¯µ½¶ÔÓ¦Î»ÖÃ
- Èç¹û¶ÔÓ¦Î»ÖÃÓĞÎÄ¼ş£¬¸²¸Ç£¬Èç¹û¶ÔÓ¦µØÖ·ÓĞÍ¬ÃûÎÄ¼ş¼Ğ, ÒÆ¶¯µ½¸ÃÎÄ¼ş¼ĞÏÂ¡£
+ * å¯¹äºç§»åŠ¨æ“ä½œ,å¦‚æœæ˜¯æ–‡ä»¶ï¼Œç›®æ ‡åœ°å€å¦‚æœä¸å­˜åœ¨ï¼Œå»ºä¸­é—´æ–‡ä»¶å¤¹ï¼Œï¼ˆä¸åŒåæ”¹åï¼‰ç§»åŠ¨åˆ°å¯¹åº”ä½ç½®
+ å¦‚æœå¯¹åº”ä½ç½®æœ‰æ–‡ä»¶ï¼Œè¦†ç›–ï¼Œå¦‚æœå¯¹åº”åœ°å€æœ‰åŒåæ–‡ä»¶å¤¹, ç§»åŠ¨åˆ°è¯¥æ–‡ä»¶å¤¹ä¸‹ã€‚
 
- * ¶ÔÓÚÄ¿Â¼µÄ¹æÔòºÍÎÄ¼şÒ»Ñù£¬Ä¿±êµØÖ·Èç¹û²»´æÔÚ£¬½¨ÖĞ¼äÎÄ¼ş¼Ğ£¬£¨²»Í¬Ãû¸ÄÃû£©ÒÆ¶¯µ½¶ÔÓ¦Î»ÖÃ
- ÏÖÔÚÄ¿±êµØÖ·´æÔÚ,µ±×ö¸¸Â·¾¶´¦Àí:
- Èç¹ûÊÇÄ¿Â¼£¬ÒÆ¶¯µ½Õâ¸öÄ¿Â¼ÏÂ£¬Èç¹ûÄ¿Â¼ÏÂÓĞÍ¬ÃûÄ¿Â¼£¬ºÏ²¢£¬ÓĞÍ¬ÃûÎÄ¼ş£¬±¨´í126£»
- Èç¹û´æÔÚµÄÊÇÎÄ¼ş,±¨´í 126
- * (ÕâÃ´Ëµ£¬Ê×ÏÈÕâ¸öTOµØÖ·£¬Èç¹ûÊÇ´æÔÚµÄÄ¿Â¼£¬ÄÇÃ´ÒÆ¶¯µ½¸ÄÄ¿Â¼ÏÂ£¬Èç¹ûÄ¿Â¼ÏÂÓĞÍ¬ÃûµÄ³åÍ»--²»Í¬Àà£¬ÄÇÃ´±¨´í,
- Èç¹ûÍ¬Àà¾Í¸²¸Ç¡£Èç¹û´æÔÚµÄÊÇÎÄ¼ş£¬ÄÇÃ´ÒÆ¶¯ÎÄ¼ş¾ÍÊÇ¸²¸Ç£¬ÒÆ¶¯Ä¿Â¼¾ÍÊÇ±¨´í¡£Èç¹ûTOµØÖ·²»´æÔÚ£¬ÄÇÃ´¶¼µ±ÒÆ¶¯¸ÄÃû´¦Àí)
+ * å¯¹äºç›®å½•çš„è§„åˆ™å’Œæ–‡ä»¶ä¸€æ ·ï¼Œç›®æ ‡åœ°å€å¦‚æœä¸å­˜åœ¨ï¼Œå»ºä¸­é—´æ–‡ä»¶å¤¹ï¼Œï¼ˆä¸åŒåæ”¹åï¼‰ç§»åŠ¨åˆ°å¯¹åº”ä½ç½®
+ ç°åœ¨ç›®æ ‡åœ°å€å­˜åœ¨,å½“åšçˆ¶è·¯å¾„å¤„ç†:
+ å¦‚æœæ˜¯ç›®å½•ï¼Œç§»åŠ¨åˆ°è¿™ä¸ªç›®å½•ä¸‹ï¼Œå¦‚æœç›®å½•ä¸‹æœ‰åŒåç›®å½•ï¼Œåˆå¹¶ï¼Œæœ‰åŒåæ–‡ä»¶ï¼ŒæŠ¥é”™126ï¼›
+ å¦‚æœå­˜åœ¨çš„æ˜¯æ–‡ä»¶,æŠ¥é”™ 126
+ * (è¿™ä¹ˆè¯´ï¼Œé¦–å…ˆè¿™ä¸ªTOåœ°å€ï¼Œå¦‚æœæ˜¯å­˜åœ¨çš„ç›®å½•ï¼Œé‚£ä¹ˆç§»åŠ¨åˆ°æ”¹ç›®å½•ä¸‹ï¼Œå¦‚æœç›®å½•ä¸‹æœ‰åŒåçš„å†²çª--ä¸åŒç±»ï¼Œé‚£ä¹ˆæŠ¥é”™,
+ å¦‚æœåŒç±»å°±è¦†ç›–ã€‚å¦‚æœå­˜åœ¨çš„æ˜¯æ–‡ä»¶ï¼Œé‚£ä¹ˆç§»åŠ¨æ–‡ä»¶å°±æ˜¯è¦†ç›–ï¼Œç§»åŠ¨ç›®å½•å°±æ˜¯æŠ¥é”™ã€‚å¦‚æœTOåœ°å€ä¸å­˜åœ¨ï¼Œé‚£ä¹ˆéƒ½å½“ç§»åŠ¨æ”¹åå¤„ç†)
  */
 
-//@retrun: ³É¹¦·µ»Ø0£¬ Ê§°Ü·µ»Ø´íÎóÂë
-//@param: act = 0 É¾³ı£»1 ĞÂÔöÎÄ¼ş£» 2 ĞÂÔöÎÄ¼ş¼Ğ£» 3 ÒÆ¶¯£» 4 ¸ÄÃû£» 5 ¿½±´
-//@param: from ²Ù×÷µÄÎÄ¼ş/¼Ğ¡£(¼à¿ØÍâÎªÈ«Â·¾¶)
-//@param: to   Ä¿±êµØÖ·¡£ (´øfromµÄÎÄ¼şÃû/Ä¿Â¼ÃûµÄµØÖ·)
-//@param: flag	== FOP_REPLACE£¬±íÊ¾ÒÆ¶¯»òÕß¿½±´¹ı³ÌÖĞ£¬Èç¹ûÄ¿±êÎÄ¼ş¼Ğ´æÔÚ£¬Ìæ»»µô¶ø²»ÊÇÄ¬ÈÏµÄºÏ²¢¡£
-//				== FOP_RECYCLE ±íÊ¾É¾³ıÊ±ºò·ÅÈë»ØÊÕÕ¾
+//@retrun: æˆåŠŸè¿”å›0ï¼Œ å¤±è´¥è¿”å›é”™è¯¯ç 
+//@param: act = 0 åˆ é™¤ï¼›1 æ–°å¢æ–‡ä»¶ï¼› 2 æ–°å¢æ–‡ä»¶å¤¹ï¼› 3 ç§»åŠ¨ï¼› 4 æ”¹åï¼› 5 æ‹·è´
+//@param: from æ“ä½œçš„æ–‡ä»¶/å¤¹ã€‚(ç›‘æ§å¤–ä¸ºå…¨è·¯å¾„)
+//@param: to   ç›®æ ‡åœ°å€ã€‚ (å¸¦fromçš„æ–‡ä»¶å/ç›®å½•åçš„åœ°å€)
+//@param: flag	== FOP_REPLACEï¼Œè¡¨ç¤ºç§»åŠ¨æˆ–è€…æ‹·è´è¿‡ç¨‹ä¸­ï¼Œå¦‚æœç›®æ ‡æ–‡ä»¶å¤¹å­˜åœ¨ï¼Œæ›¿æ¢æ‰è€Œä¸æ˜¯é»˜è®¤çš„åˆå¹¶ã€‚
+//				== FOP_RECYCLE è¡¨ç¤ºåˆ é™¤æ—¶å€™æ”¾å…¥å›æ”¶ç«™
 
-//ÎÄ¼şµÄÒÆ¶¯ºÍ¿½±´£¬Ä¿±êÎªÎÄ¼şÂ·¾¶£¬ÇÒÒÆ¶¯ÊÇ¿ÉÒÔ¸Ä±äÎÄ¼şÃû
-//TODO: »ØÊÕÕ¾ÓÃÌØÊâµÄÏûÏ¢ÆÁ±Î£¬ÒòÎª´Ó»ØÊÕÕ¾»¹Ô­ĞèÒªÔÚÔ­µØ»¹Ô­(ĞèÒª¹ıÂËÁĞ±íÖ§³Ö)
-//TODO: Ê§°ÜrollbackÔõÃ´°ì£¿
-//TODO: Èç¹ûÉ¾³ıÒ»¸öÄ¿Â¼µÄ»°£¬ÄÇÃ´to×îºÃ¸øÒ»¸ö¼à¿ØÍâµÄÁÙÊ±Ä¿Â¼
+//æ–‡ä»¶çš„ç§»åŠ¨å’Œæ‹·è´ï¼Œç›®æ ‡ä¸ºæ–‡ä»¶è·¯å¾„ï¼Œä¸”ç§»åŠ¨æ˜¯å¯ä»¥æ”¹å˜æ–‡ä»¶å
+//TODO: å›æ”¶ç«™ç”¨ç‰¹æ®Šçš„æ¶ˆæ¯å±è”½ï¼Œå› ä¸ºä»å›æ”¶ç«™è¿˜åŸéœ€è¦åœ¨åŸåœ°è¿˜åŸ(éœ€è¦è¿‡æ»¤åˆ—è¡¨æ”¯æŒ)
+//TODO: å¤±è´¥rollbackæ€ä¹ˆåŠï¼Ÿ
+//TODO: å¦‚æœåˆ é™¤ä¸€ä¸ªç›®å½•çš„è¯ï¼Œé‚£ä¹ˆtoæœ€å¥½ç»™ä¸€ä¸ªç›‘æ§å¤–çš„ä¸´æ—¶ç›®å½•
 
 DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const string & to, 
 										   DWORD flag, int * LPtrCancel)
@@ -619,7 +619,7 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 	if(isAbsPath)
 	{
 		assert(act == 3 || act == 5);
-		wstr_from_full = wstr_from + L'\0';		//XXX ±ØĞëÕâÀï¼Ó\0£¬²»ÄÜÓÃÁÙÊ±±äÁ¿
+		wstr_from_full = wstr_from + L'\0';		//XXX å¿…é¡»è¿™é‡ŒåŠ \0ï¼Œä¸èƒ½ç”¨ä¸´æ—¶å˜é‡
 	}
 	else
 		wstr_from_full = m_homew + L'\\' + wstr_from + L'\0';
@@ -633,8 +633,8 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 
 	SHFILEOPSTRUCT FileOp; 
 	ZeroMemory((void*)&FileOp,sizeof(SHFILEOPSTRUCT));
-	//ÕâÀï¿ÉÄÜ»á±»¿¨×¡£¬ÒòÎªÓÉÓÚÃ»ÓĞ³ö´íµÄUIĞÅÏ¢£¬¿ÉÄÜ»áÕÕ³É»ìÂÒ£¬»¹ÊÇÒªÓÃ FOF_NO_UI
-	FileOp.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR;	//FOF_NOCONFIRMMKDIR Õâ¸öÓĞ×÷ÓÃ£¿
+	//è¿™é‡Œå¯èƒ½ä¼šè¢«å¡ä½ï¼Œå› ä¸ºç”±äºæ²¡æœ‰å‡ºé”™çš„UIä¿¡æ¯ï¼Œå¯èƒ½ä¼šç…§æˆæ··ä¹±ï¼Œè¿˜æ˜¯è¦ç”¨ FOF_NO_UI
+	FileOp.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR;	//FOF_NOCONFIRMMKDIR è¿™ä¸ªæœ‰ä½œç”¨ï¼Ÿ
 	FileOp.fFlags = FOF_NO_UI;
 
 	BlacklistItem bl_item(0, wstr_from, wstr_to);
@@ -645,29 +645,29 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 	DWORD action = 0;
 	switch(act)
 	{
-	case 0:	//É¾³ı
+	case 0:	//åˆ é™¤
 		bl_item.act = FILE_ACTION_REMOVED;
 		m_blacklist->Add(bl_item);
 		actives.push_front(bl_item);
-		if(isfile || flag & FOP_RECYCLE)	//É¾³ıÎÄ¼ş
+		if(isfile || flag & FOP_RECYCLE)	//åˆ é™¤æ–‡ä»¶
 		{
 			FileOp.pFrom = wstr_from_full.c_str();
 			FileOp.wFunc = FO_DELETE; 
-			if(flag & FOP_RECYCLE) //»ØÊÕÕ¾
+			if(flag & FOP_RECYCLE) //å›æ”¶ç«™
 				FileOp.fFlags |= FOF_ALLOWUNDO; 
 			err = ::SHFileOperation(&FileOp);
 			//FileOp.fFlags &= ~FOF_ALLOWUNDO; 
 		}
-		else	//É¾³ıÄ¿Â¼£¬ÒòÎªÓĞº¢×Ó£¬ËùÒÔ²»×ßºÚÃûµ¥
+		else	//åˆ é™¤ç›®å½•ï¼Œå› ä¸ºæœ‰å­©å­ï¼Œæ‰€ä»¥ä¸èµ°é»‘åå•
 		{
 			goto do_in_tempdir;
 		}
 		break;
-	case 1:	//ĞÂÔöÎÄ¼ş
+	case 1:	//æ–°å¢æ–‡ä»¶
 		if(isOfficefile)
 		{
-			//office ÒòÎªÁÙÊ±ÎÄ¼şÓĞÁ½¸ö²Ù×÷
-			//TODO:XP µ¼ÖÂµÄ?
+			//office å› ä¸ºä¸´æ—¶æ–‡ä»¶æœ‰ä¸¤ä¸ªæ“ä½œ
+			//TODO:XP å¯¼è‡´çš„?
 			if(m_isXP)
 			{
 				bl_item.act = FILE_REMOVED;
@@ -678,7 +678,7 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 			m_blacklist->Add(bl_item);
 			actives.push_front(bl_item);
 
-			err = CreateOfficeFile(wstr_from_full.c_str());		//²»ÄÜÖ±½ÓÓÃÒòÎªÄ©Î²¶àÁË¸ö\0
+			err = CreateOfficeFile(wstr_from_full.c_str());		//ä¸èƒ½ç›´æ¥ç”¨å› ä¸ºæœ«å°¾å¤šäº†ä¸ª\0
 			exist_is_ok = true;
 		}
 		else
@@ -694,7 +694,7 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 										 | FILE_SHARE_WRITE
 										 | FILE_SHARE_DELETE,					// share mode
 										 NULL,									// security descriptor
-										 //CREATE_AWAYLS,	//¸²¸Ç?
+										 //CREATE_AWAYLS,	//è¦†ç›–?
 										 CREATE_NEW,							// how to create
 										 FILE_ATTRIBUTE_NORMAL,					// file attributes
 										 NULL);									// file with attributes to copy
@@ -704,11 +704,11 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 				CloseHandle(filehd);
 		}
 		break;
-	case 2:	//ĞÂÔöÎÄ¼ş¼Ğ
+	case 2:	//æ–°å¢æ–‡ä»¶å¤¹
 		if(attr != INVALID_FILE_ATTRIBUTES)
 			if(FILE_ATTRIBUTE_DIRECTORY & attr)
 				return 0;
-			else //ÎªÎÄ¼ş
+			else //ä¸ºæ–‡ä»¶
 				return ERROR_FILE_EXISTS;
 		bl_item.act = FILE_ACTION_ADDED;
 		{
@@ -718,7 +718,7 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 			{
 				const wstring & fa = m_homew + L'\\' + fathers[i];
 				attr = ::GetFileAttributes(fa.c_str());
-				if(attr != INVALID_FILE_ATTRIBUTES)	//´æÔÚ
+				if(attr != INVALID_FILE_ATTRIBUTES)	//å­˜åœ¨
 					break;
 			}
 			for(--i; i>=0; i--)
@@ -746,16 +746,16 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 				err = GetLastError();
 				exist_is_ok = true;
 			}
-		}//´´½¨ÎÄ¼ş¼Ğ²ã¼¶
+		}//åˆ›å»ºæ–‡ä»¶å¤¹å±‚çº§
 		break;
-	case 3:	//ÒÆ¶¯
+	case 3:	//ç§»åŠ¨
 		if(attr == INVALID_FILE_ATTRIBUTES)
 			return ERROR_FILE_EXISTS;
-		//¿¼ÂÇÄ¿±ê´æÔÚ²»£¿
+		//è€ƒè™‘ç›®æ ‡å­˜åœ¨ä¸ï¼Ÿ
 		if(dest_is_exist && !isfile)
 		{
 			if(flag & FOP_REPLACE)
-			{//É¾³ıoldÄ¿Â¼
+			{//åˆ é™¤oldç›®å½•
 				wstring thread_dir = FileSystemHelper::GetThreadTempdir(m_homew);
 				if(false == file_exists(thread_dir))
 				{
@@ -772,29 +772,29 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 				FileOp.wFunc = FO_MOVE; 
 				err = ::SHFileOperation(&FileOp);
 				if(err) goto fail;
-				//É¾³ıµô
+				//åˆ é™¤æ‰
 				inner_path2 = thread_dir + L"\\tmp\\" + wstr_to_name + L'\0';
 				FileOp.pFrom = inner_path2.c_str();
 				FileOp.pTo = NULL;
 				FileOp.wFunc = FO_DELETE; 
 				err = ::SHFileOperation(&FileOp);
 				if(err)
-				{//µ«ÊÇ»¹¼ÌĞø×ö
+				{//ä½†æ˜¯è¿˜ç»§ç»­åš
 					sprintf_s(msgbuf, 1024, "meet error in DoActWithoutNotify delete tempfile: error code:%d, act=%d ,from = %s, to = %s", err, act, from.c_str(), to.c_str());
 					dlog(&msgbuf[0]);
 				}
 			}
 			else
-			{//¸²¸Ç
-				err = ERROR_FILE_EXISTS; //FIXME ´æÔÚÄ¿Â¼Ä¿Ç°ÏÈÕâÃ´´¦Àí°É
+			{//è¦†ç›–
+				err = ERROR_FILE_EXISTS; //FIXME å­˜åœ¨ç›®å½•ç›®å‰å…ˆè¿™ä¹ˆå¤„ç†å§
 				goto fail;
-				//Ä¿Â¼µÄÄ¿±ê´æÔÚµÄ»°, °´ÕÕ¹æÔòÈ¡¸¸Â·¾¶,×öwindowsÄ¬ÈÏµÄºÏ²¢
+				//ç›®å½•çš„ç›®æ ‡å­˜åœ¨çš„è¯, æŒ‰ç…§è§„åˆ™å–çˆ¶è·¯å¾„,åšwindowsé»˜è®¤çš„åˆå¹¶
 				//wstr_to_full = GetBaseDIR(wstr_to_full.c_str()) + L'\0';
 			}
 		}
 
 		if(!isAbsPath)
-		{//¼à¿ØÄÚÒÆ¶¯
+		{//ç›‘æ§å†…ç§»åŠ¨
 			bl_item.act = FILE_ACTION_REMOVED;
 			bl_item.path2 = wstring();
 			m_blacklist->Add(bl_item);
@@ -806,7 +806,7 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 		{
 			if(m_isXP)
 			{
-				m_blacklist->Add(BlacklistItem(FILE_ACTION_REMOVED, wstr_to));	//xp µÄ¸²¸Ç»áÏÈ·¢É¾³ıÏûÏ¢
+				m_blacklist->Add(BlacklistItem(FILE_ACTION_REMOVED, wstr_to));	//xp çš„è¦†ç›–ä¼šå…ˆå‘åˆ é™¤æ¶ˆæ¯
 				actives.push_front(BlacklistItem(FILE_ACTION_REMOVED, wstr_to));
 			}
 			else 
@@ -816,14 +816,14 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 		actives.push_front(BlacklistItem(action, wstr_to));
 
 		FileOp.pFrom = wstr_from_full.c_str(); 
-		FileOp.pTo = wstr_to_full.c_str();	//ÒÆ¶¯£¬¸½´øÁËÖØÃüÃû
+		FileOp.pTo = wstr_to_full.c_str();	//ç§»åŠ¨ï¼Œé™„å¸¦äº†é‡å‘½å
 		FileOp.wFunc = FO_MOVE; 
 		err = ::SHFileOperation(&FileOp);
 		break;
-	case 4:	//¸ÄÃû
+	case 4:	//æ”¹å
 		if(attr == INVALID_FILE_ATTRIBUTES)
 			return ERROR_FILE_EXISTS;
-		//XXX ²»ÔÊĞí´æÔÚ¸ÄÃûµÄÄ¿±êÏî
+		//XXX ä¸å…è®¸å­˜åœ¨æ”¹åçš„ç›®æ ‡é¡¹
 		if(dest_is_exist)
 			return ERROR_FILE_EXISTS;
 		if(!isfile)
@@ -832,17 +832,17 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 			m_blacklist->Add(bl_item);
 			actives.push_front(bl_item);
 		}
-		//bl_item.act = isfile ? FILE_RENAMED : DIR_RENAMED;	//ÆäÊµÕâÀïÅĞ¶Ï¹»ÁË
-		bl_item.act = FILE_RENAMED;	//·ÀÖ¹ÒâÍâ¶à¼ÓÒ»¸öÎÄ¼ş¸ÄÃû(ºÜĞ¡µÄ¼¸ÂÊ, µ«ÊÇ¸ÄÃûÕâ¸ö²Ù×÷ºÜ±£ÏÕ£¬ËùÒÔ¶à¼ÓÒ»¸öÅĞ¶ÏÎŞËùÎ½)
+		//bl_item.act = isfile ? FILE_RENAMED : DIR_RENAMED;	//å…¶å®è¿™é‡Œåˆ¤æ–­å¤Ÿäº†
+		bl_item.act = FILE_RENAMED;	//é˜²æ­¢æ„å¤–å¤šåŠ ä¸€ä¸ªæ–‡ä»¶æ”¹å(å¾ˆå°çš„å‡ ç‡, ä½†æ˜¯æ”¹åè¿™ä¸ªæ“ä½œå¾ˆä¿é™©ï¼Œæ‰€ä»¥å¤šåŠ ä¸€ä¸ªåˆ¤æ–­æ— æ‰€è°“)
 		m_blacklist->Add(bl_item);
 		actives.push_front(bl_item);
 
 		FileOp.pFrom = wstr_from_full.c_str(); 
-		FileOp.pTo = wstr_to_full.c_str();	//ÒÆ¶¯£¬¸½´øÁËÖØÃüÃû
+		FileOp.pTo = wstr_to_full.c_str();	//ç§»åŠ¨ï¼Œé™„å¸¦äº†é‡å‘½å
 		FileOp.wFunc = FO_MOVE; 
 		err = ::SHFileOperation(&FileOp);
 		break;
-	case 5:	//¿½±´
+	case 5:	//æ‹·è´
 		if(attr == INVALID_FILE_ATTRIBUTES)
 			return ERROR_FILE_EXISTS;
 		bl_item.act = FILE_ACTION_ADDED;
@@ -854,7 +854,7 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 		break;
 	}// switch(act)
 
-	goto final_quit;	//Ìø¹ıdo_in_tempdir
+	goto final_quit;	//è·³è¿‡do_in_tempdir
 
 do_in_tempdir:
 	err = FileSystemHelper::DoActWithoutNotify_impl(act, m_homew, flag, isAbsPath, m_isXP, 
@@ -895,19 +895,19 @@ void DirectoryMonitor::UpdateAttributeCache(const wstring & rpathw)
 DWORD DirectoryMonitor::GetAttributeFromCache(const wstring & rpathw, DWORD act, DWORD & self)
 {
 	bool isdel = ((act == FILE_ACTION_REMOVED)||(act == FILE_ACTION_RENAMED_OLD_NAME));
-	//Èç¹ûÊÇnewËµÃ÷ÏÖÔÚcacheÀïÈç¹û´æÔÚÄÇ¿Ï¶¨ÊÇÊ§Ğ§ÁËµÄ
+	//å¦‚æœæ˜¯newè¯´æ˜ç°åœ¨cacheé‡Œå¦‚æœå­˜åœ¨é‚£è‚¯å®šæ˜¯å¤±æ•ˆäº†çš„
 	bool isnew = (act == FILE_ACTION_ADDED || act == FILE_ACTION_RENAMED_NEW_NAME);
-	DWORD ret, f_attr, attr = 0;	//±íÊ¾ÎªÉ¾³ıÁË
+	DWORD ret, f_attr, attr = 0;	//è¡¨ç¤ºä¸ºåˆ é™¤äº†
 	map<wstring, DWORD>::iterator it = m_file_attrs.find(rpathw);
 	if(it != m_file_attrs.end())
 	{
 		if(isdel)
 			it->second |= FILE_ATTRIBUTE_DELETED;
-		if(!isnew) //ĞÂÔöÁËÄÇ¾ÍÒª¸üĞÂÕâÌõÂ·¾¶ÉÏµÄËùÓĞ¼ÇÂ¼
+		if(!isnew) //æ–°å¢äº†é‚£å°±è¦æ›´æ–°è¿™æ¡è·¯å¾„ä¸Šçš„æ‰€æœ‰è®°å½•
 			return it->second;
 	}
 
-	//Ã»ÕÒ×Å»òÕßÊÇĞÂµÄ
+	//æ²¡æ‰¾ç€æˆ–è€…æ˜¯æ–°çš„
 	//map<wstring, DWORD> rec;
 	bool meet_special = false;
 	if(isdel)
@@ -922,23 +922,23 @@ DWORD DirectoryMonitor::GetAttributeFromCache(const wstring & rpathw, DWORD act,
 	bool invalid = false;
 	vector<wstring> fathers = GetBaseDIRs(rpathw);
 	size_t s = fathers.size();
-	for(int i = s-1; i >= 0; i--)	//¶¥µ½µ×
+	for(int i = s-1; i >= 0; i--)	//é¡¶åˆ°åº•
 	{
 		const wstring & fpath = fathers[i];
 		it = m_file_attrs.find(fpath);
 		if(!invalid)
 		{
-			if(it == m_file_attrs.end() || (isnew && isDel(it->second)))	//Ã»ÕÒµ½»òÕßĞÂÔöµ«ÊÇÅöµ½ÁËÉ¾³ıµÄÄÇ¸ö¸¸Ä¿Â¼
-				invalid = true;	//ÕâÊ±ºò¾ÍÒªget attr
+			if(it == m_file_attrs.end() || (isnew && isDel(it->second)))	//æ²¡æ‰¾åˆ°æˆ–è€…æ–°å¢ä½†æ˜¯ç¢°åˆ°äº†åˆ é™¤çš„é‚£ä¸ªçˆ¶ç›®å½•
+				invalid = true;	//è¿™æ—¶å€™å°±è¦get attr
 		}
 		if(invalid) {	
-			//Ã»ÓÃf_attr_old, ÒòÎªÎŞĞ§ÁË
+			//æ²¡ç”¨f_attr_old, å› ä¸ºæ— æ•ˆäº†
 			//f_attr_old = it != m_file_attrs.end() ? it->second : 0;
 			f_attr = ::GetFileAttributes((m_homew + L"/" + fpath).c_str());
 			if(f_attr == INVALID_FILE_ATTRIBUTES)
 				f_attr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_DELETED;
 			if(!meet_special)
-				meet_special = isSpecial(f_attr);	//·¢ÏÖÊÇspecialÎÄ¼ş¼Ğ
+				meet_special = isSpecial(f_attr);	//å‘ç°æ˜¯specialæ–‡ä»¶å¤¹
 			else
 				f_attr |= FILE_ATTRIBUTE_HIDDEN;
 			m_file_attrs[fpath] = f_attr;
@@ -951,7 +951,7 @@ DWORD DirectoryMonitor::GetAttributeFromCache(const wstring & rpathw, DWORD act,
 	if(meet_special)
 		ret |= FILE_ATTRIBUTE_HIDDEN;
 	m_file_attrs[rpathw] = ret;
-	//m_file_attrs.insert(rec.begin(), rec.end()); //insert²»»á²åÈëÒÑ´æÔÚµÄitem
+	//m_file_attrs.insert(rec.begin(), rec.end()); //insertä¸ä¼šæ’å…¥å·²å­˜åœ¨çš„item
 	return ret;
 }
 
@@ -959,7 +959,7 @@ int DirectoryMonitor::GetNotify(struct TDirectoryChangeNotification & notify)
 {
 	wstring rpathw(notify.rPath.GetBuffer());
 
-	//²éÕÒÊÇ·ñÓĞattr
+	//æŸ¥æ‰¾æ˜¯å¦æœ‰attr
 	//bool isdir = notify.type == DIR_TYPE;
 	bool isdir = false;
 	DWORD self_attr = -1;
@@ -978,7 +978,7 @@ int DirectoryMonitor::GetNotify(struct TDirectoryChangeNotification & notify)
 	if(isSpecial(attr) || isFiltType(rpathw))
 	{
 		no.special = true;
-		//no.filted = true;	//XXX ²»ÒªÉèÖÃ£¬ÒòÎªÕâ¸öÊÇÓÃÀ´ÅĞ¶ÏĞĞÎªµÄ£¬×îºó¶Ôspecial½øĞĞ¹ıÂË
+		//no.filted = true;	//XXX ä¸è¦è®¾ç½®ï¼Œå› ä¸ºè¿™ä¸ªæ˜¯ç”¨æ¥åˆ¤æ–­è¡Œä¸ºçš„ï¼Œæœ€åå¯¹specialè¿›è¡Œè¿‡æ»¤
 	}
 	cout << "path:" << WideToMutilByte(no.path) << " is " << \
 	(no.special? "special":"normal") <<	(no.fspec? " ,father is special" : " ,father is OK") << \
@@ -1000,7 +1000,7 @@ int DirectoryMonitor::GetNotify(struct TDirectoryChangeNotification & notify)
 #define maybe_copy_dir	4
 
 
-//Êµ¼ÊÉÏÒ²¾ÍÊÇ¼¸¸öµØ·½Òª²ÂÏë
+//å®é™…ä¸Šä¹Ÿå°±æ˜¯å‡ ä¸ªåœ°æ–¹è¦çŒœæƒ³
 bool DirectoryMonitor::guess(notification_t & notify)
 {
 	const wstring & path = notify.path;
@@ -1036,8 +1036,8 @@ bool DirectoryMonitor::guess(notification_t & notify)
 	return false;
 }
 
-//·µ»ØÊÇ·ñ¼ÓÈëÕâ¸öfilter 
-//Èç¹ûÒª¼ÓÈëÅĞ¶Ï¶ÓÁĞ£¬·µ»Ø true; Èç¹ûÒª¹ıÂËËüÖ±½Ófilter.filted = true
+//è¿”å›æ˜¯å¦åŠ å…¥è¿™ä¸ªfilter 
+//å¦‚æœè¦åŠ å…¥åˆ¤æ–­é˜Ÿåˆ—ï¼Œè¿”å› true; å¦‚æœè¦è¿‡æ»¤å®ƒç›´æ¥filter.filted = true
 bool DirectoryMonitor::filt_old_notify(notification_t & filter, int advance)
 {
 	const wstring & path = filter.path;
@@ -1058,29 +1058,29 @@ bool DirectoryMonitor::filt_old_notify(notification_t & filter, int advance)
 		{
 			if(it->filted || it->path != path) continue;
 			if(it->act == FILE_ACTION_MODIFIED || it->act == FILE_ACTION_ADDED)
-			{//±£Áô×îÔçµÄÄÇ¸öÍ¨Öª(¿ÉÒÔ¸ù¾İaddÀ´´¦Àírename²Ù×÷)
-				filter.filted = true; //debug ÇåÎúĞ©
+			{//ä¿ç•™æœ€æ—©çš„é‚£ä¸ªé€šçŸ¥(å¯ä»¥æ ¹æ®addæ¥å¤„ç†renameæ“ä½œ)
+				filter.filted = true; //debug æ¸…æ™°äº›
 				return true;
-				// return false;	//XXX ²»¼ÓÈë, ×îºóÓÃÕâ¸ö
+				// return false;	//XXX ä¸åŠ å…¥, æœ€åç”¨è¿™ä¸ª
 			}
 		}
 		break;
 	case FILE_REMOVED:
 	case DIR_REMOVED:
 	case FILE_ACTION_REMOVED:
-		//for file ¹ıÂËĞŞ¸ÄµÄÍ¨Öª
+		//for file è¿‡æ»¤ä¿®æ”¹çš„é€šçŸ¥
 		if(!filter.isdir)
 		{
 			for(; it != endit; ++it)
 			{
 				if(it->filted || it->path != path) continue;
-				//ÕâÀïµÄÒâË¼ÊÇ£¬Èç¹ûÅöµ½¸ÄÃûºóÉ¾³ıÁË£¬ÄÇÃ´¾ÍÖ±½ÓÉ¾³ıÔ­ÃûµÄ
+				//è¿™é‡Œçš„æ„æ€æ˜¯ï¼Œå¦‚æœç¢°åˆ°æ”¹åååˆ é™¤äº†ï¼Œé‚£ä¹ˆå°±ç›´æ¥åˆ é™¤åŸåçš„
 				if(it->act == FILE_RENAMED || it->act == DIR_RENAMED)
 				{
 					filter.filted = true;
 					it->path = it->path2;
 					it->act = FILE_ACTION_REMOVED;
-					//ÕâÊ±ºòĞèÒª·´Ïò¹ıÂË, Èç¹ûºóÃæÓÖÓĞ¸Ä±äÁË£¬ÄÇÕâ¸öÉ¾³ı²Ù×÷¹ıÂËµô
+					//è¿™æ—¶å€™éœ€è¦åå‘è¿‡æ»¤, å¦‚æœåé¢åˆæœ‰æ”¹å˜äº†ï¼Œé‚£è¿™ä¸ªåˆ é™¤æ“ä½œè¿‡æ»¤æ‰
 					vector<notification_t>::iterator it2 = it.base();
 					for(; it2 != m_notifications.end(); ++it2)
 					{
@@ -1089,15 +1089,15 @@ bool DirectoryMonitor::filt_old_notify(notification_t & filter, int advance)
 							break;
 						}
 					}
-					//»¹Ô­³ÉÔ­À´µÄÉ¾³ı
+					//è¿˜åŸæˆåŸæ¥çš„åˆ é™¤
 					return true;
 				}
 				if(it->act == FILE_ACTION_MODIFIED || it->act == FILE_ACTION_ADDED)
 				{
 					it->filted = true;
-					if(it->act == FILE_ACTION_ADDED) //ok, all filted£¬Ìí¼ÓºÍÉ¾³ıµÖÏúÁË²»Í¨Öª
+					if(it->act == FILE_ACTION_ADDED) //ok, all filtedï¼Œæ·»åŠ å’Œåˆ é™¤æŠµé”€äº†ä¸é€šçŸ¥
 					{
-						filter.filted = true; //debug ÇåÎúĞ©
+						filter.filted = true; //debug æ¸…æ™°äº›
 						return true;
 					}
 				}
@@ -1105,14 +1105,14 @@ bool DirectoryMonitor::filt_old_notify(notification_t & filter, int advance)
 			}
 		}
 		else
-		{ //for dir ¹ıÂËº¢×ÓµÄÉ¾³ıÍ¨Öª ()
+		{ //for dir è¿‡æ»¤å­©å­çš„åˆ é™¤é€šçŸ¥ ()
 			for(; it != endit; ++it)
 			{
 				if(it->filted) continue;
 				if(!isChildren(path, it->path) && path != it->path) continue;
 
-				//rename ºÍ move ²Ù×÷²»¹ıÂË£¬ÒòÎªÉæ¼°µ½ÁíÒ»¸öÎÄ¼ş
-				//ÒªÃ´°ÑÔ­À´µÄÉ¾³ı(µ«ÊÇ¸Ä±äÁËÓïÒå)
+				//rename å’Œ move æ“ä½œä¸è¿‡æ»¤ï¼Œå› ä¸ºæ¶‰åŠåˆ°å¦ä¸€ä¸ªæ–‡ä»¶
+				//è¦ä¹ˆæŠŠåŸæ¥çš„åˆ é™¤(ä½†æ˜¯æ”¹å˜äº†è¯­ä¹‰)
 				if(it->act == FILE_ACTION_REMOVED	|| 
 				   it->act == FILE_ACTION_MODIFIED	|| 
 				   it->act == FILE_ACTION_ADDED)
@@ -1120,7 +1120,7 @@ bool DirectoryMonitor::filt_old_notify(notification_t & filter, int advance)
 
 				if(it->handled)
 					if(
-					   //it->act == FILE_ADDED	||	//²»´æÔÚ
+					   //it->act == FILE_ADDED	||	//ä¸å­˜åœ¨
 					   //it->act == FILE_MODIFIED ||
 					   it->act == DIR_ADDED		||
 					   it->act == DIR_COPY		||
@@ -1137,7 +1137,7 @@ bool DirectoryMonitor::filt_old_notify(notification_t & filter, int advance)
 		break;
 	case FILE_RENAMED:
 	case DIR_RENAMED:
-		//if(filter.special || filter.spec2)	//¸ÄÃû²»»áÉæ¼°µ½ÊôĞÔ
+		//if(filter.special || filter.spec2)	//æ”¹åä¸ä¼šæ¶‰åŠåˆ°å±æ€§
 		//	break;
 	case FILE_MOVED:
 	case DIR_MOVED:
@@ -1149,25 +1149,25 @@ bool DirectoryMonitor::filt_old_notify(notification_t & filter, int advance)
 
 			if(it->path == path && !not_cmp)
 			{
-				//ÒÔÇ°µÄ¸Ä¶¯¶¼ÎŞĞ§£¬±»rename¸²¸ÇÁË
+				//ä»¥å‰çš„æ”¹åŠ¨éƒ½æ— æ•ˆï¼Œè¢«renameè¦†ç›–äº†
 				if(it->act == FILE_ACTION_MODIFIED || it->act == FILE_ACTION_ADDED)
 					it->filted = true;
-				if(it->act == FILE_REMOVED || it->act == FILE_ACTION_REMOVED)	//ÎÄ¼şµÄÉ¾³ı±»¹ıÂËÁË
+				if(it->act == FILE_REMOVED || it->act == FILE_ACTION_REMOVED)	//æ–‡ä»¶çš„åˆ é™¤è¢«è¿‡æ»¤äº†
 					it->filted = true;
 				else
-					not_cmp = true;	//¼òµ¥±È½Ï
+					not_cmp = true;	//ç®€å•æ¯”è¾ƒ
 			}
-			//ÉÏÒ»¸öµÄÂ·¾¶ÊÇ£¬renameµÄoldname
+			//ä¸Šä¸€ä¸ªçš„è·¯å¾„æ˜¯ï¼Œrenameçš„oldname
 			if(it->path == path2)
 			{
 				if(it->act == FILE_ACTION_MODIFIED) {
 					it->filted = true;
 					change_act2 = FILE_ACTION_MODIFIED;
-					//×îºóÒª¼ÓÈëmodify
+					//æœ€åè¦åŠ å…¥modify
 				} else if(it->act == FILE_ACTION_ADDED) {
 					it->filted = true;
 					change_act2 = FILE_ACTION_ADDED;
-				} else if(it->act == filter.act) {	//¿ÉÄÜĞÔĞ¡, Á¬Ğø¸ÄÃû
+				} else if(it->act == filter.act) {	//å¯èƒ½æ€§å°, è¿ç»­æ”¹å
 					it->filted = true;
 					filter.path2 = it->path2;
 					filter.spec2 = it->spec2;
@@ -1177,7 +1177,7 @@ bool DirectoryMonitor::filt_old_notify(notification_t & filter, int advance)
 		if(change_act2 == FILE_ACTION_ADDED)
 			filter.act = FILE_ACTION_ADDED;
 		else if(change_act2 == FILE_ACTION_MODIFIED)
-		{//ĞÂ¼ÓÒ»¸ö±íÊ¾modifyµÄÏûÏ¢
+		{//æ–°åŠ ä¸€ä¸ªè¡¨ç¤ºmodifyçš„æ¶ˆæ¯
 			dlog("add a new modify because changed before rename");
 			notification_t newone(filter);
 			newone.act = FILE_ACTION_MODIFIED;
@@ -1199,16 +1199,16 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 	//m_showfilt = file_exists(m_homew + L'\\' + TEMP_DIRNAMEW + L'\\' + L"showfilt.flag") ? true : false;
 	//return false;
 	if(file_exists(m_homew + L'\\' + TEMP_DIRNAMEW + L'\\' + L"test.flag"))
-		return false;	//ÕâÀï¾Í²»¹ıÂËÁË
+		return false;	//è¿™é‡Œå°±ä¸è¿‡æ»¤äº†
 	const wstring & path = notify.path;
 	bool ret = false;
 	DWORD act = notify.act;
-	//Í¨³£ÎÒÃÇÒªÅĞ¶ÏÇ°Ò»¸öÊÇ·ñÊÇÓĞ¹ØÁªµÄnotify£¬ÕâÀï¿ÉÒÔÅĞ¶ÏºÜ¶àÌØÊâÇé¿ö
+	//é€šå¸¸æˆ‘ä»¬è¦åˆ¤æ–­å‰ä¸€ä¸ªæ˜¯å¦æ˜¯æœ‰å…³è”çš„notifyï¼Œè¿™é‡Œå¯ä»¥åˆ¤æ–­å¾ˆå¤šç‰¹æ®Šæƒ…å†µ
 	size_t size = m_notifications.size();
 	size_t advance = 0;
 
-	//Èı¸ö¿ª¹Ø
-	bool handle = true;	//XXX Ã»ÓÃµ½£¿
+	//ä¸‰ä¸ªå¼€å…³
+	bool handle = true;	//XXX æ²¡ç”¨åˆ°ï¼Ÿ
 	bool no_need_guess = false;
 	bool filt_old = true;
 
@@ -1217,27 +1217,27 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 	m_guess_cnt++;
 
 
-	//ÏìÓ¦²ÂÏë£¬Èç¹û²ÂÏë´íÎó£¬¼ÌĞøĞÂµÄ²ÂÏë£¬ÕıÈ·ÔòÊµÏÖ²ÂÏë
-	//XXX Ä¿Ç°µÄ°æ±¾À´Ëµ£¬ÓÉÓÚ²ÂÏë±ØĞëÊÇÁ¬ĞøµÄ£¬ËùÒÔÁ½¸ö²¢·¢µÄ²Ù×÷»áµ¼ÖÂÓĞĞ©²ÂÏëÊ§°Ü
-	//µ«ÊÇ£¬Ö»ÓĞ¿É´ò¶ÏµÄ¶¯×÷²ÅÊÜÓ°Ïì£¬ÏñmoveÕâÑùµÄÁ¬ĞøÍ¨Öª²»ÊÜÓ°Ïì¡£
+	//å“åº”çŒœæƒ³ï¼Œå¦‚æœçŒœæƒ³é”™è¯¯ï¼Œç»§ç»­æ–°çš„çŒœæƒ³ï¼Œæ­£ç¡®åˆ™å®ç°çŒœæƒ³
+	//XXX ç›®å‰çš„ç‰ˆæœ¬æ¥è¯´ï¼Œç”±äºçŒœæƒ³å¿…é¡»æ˜¯è¿ç»­çš„ï¼Œæ‰€ä»¥ä¸¤ä¸ªå¹¶å‘çš„æ“ä½œä¼šå¯¼è‡´æœ‰äº›çŒœæƒ³å¤±è´¥
+	//ä½†æ˜¯ï¼Œåªæœ‰å¯æ‰“æ–­çš„åŠ¨ä½œæ‰å—å½±å“ï¼Œåƒmoveè¿™æ ·çš„è¿ç»­é€šçŸ¥ä¸å—å½±å“ã€‚
 	switch(m_expert_act)
 	{
-	case maybe_out_move_dir: //ÅĞ¶ÏÊÇ·ñÊÇ´ÓÍâ²¿moveµÄdir, ÅĞ¶ÏµãÊÇ½ô½Ó×ÅµÄÄ¿Â¼Í¨Öª»òÕßÊÇº¢×ÓµÄcopy
-		//XXX ÔÚ×îºó³¬Ê±Ê±ºòÒ²Òª´¦ÀíÕâ¸ö²ÂÏë
+	case maybe_out_move_dir: //åˆ¤æ–­æ˜¯å¦æ˜¯ä»å¤–éƒ¨moveçš„dir, åˆ¤æ–­ç‚¹æ˜¯ç´§æ¥ç€çš„ç›®å½•é€šçŸ¥æˆ–è€…æ˜¯å­©å­çš„copy
+		//XXX åœ¨æœ€åè¶…æ—¶æ—¶å€™ä¹Ÿè¦å¤„ç†è¿™ä¸ªçŒœæƒ³
 		if(m_guess_cnt == 1) {
 			notification_t & last = m_notifications[size-1];
 			assert(last.expert_act == m_expert_act);
 
 			if(act == FILE_ACTION_MODIFIED && notify.isdir)
 			{
-				if(path == GetBaseDIR(m_expert_path)) //ÏÂÒ»¸öÊÇ¸¸Â·¾¶£¬okÕı³£ÏûÏ¢»¹²»ÄÜ×÷ÎªÇø·ÖÌõ¼ş£¬ÅĞ¶ÏÏÂÒ»¸öÈ¥
-				{//²ÂÏë, ÓĞ¿ÉÄÜÕâÀï½áÊøÁË£¬¾ÍÒ»¸ömove dir¹ı³Ì
-					//²»ÒªÔÚÕâÀïÅĞ¶Ï£¬ÒòÎª¿ÉÄÜº¢×Ó»¹Ã»ÓĞcopy¹ıÀ´£¬Ì«ÔçÁË
+				if(path == GetBaseDIR(m_expert_path)) //ä¸‹ä¸€ä¸ªæ˜¯çˆ¶è·¯å¾„ï¼Œokæ­£å¸¸æ¶ˆæ¯è¿˜ä¸èƒ½ä½œä¸ºåŒºåˆ†æ¡ä»¶ï¼Œåˆ¤æ–­ä¸‹ä¸€ä¸ªå»
+				{//çŒœæƒ³, æœ‰å¯èƒ½è¿™é‡Œç»“æŸäº†ï¼Œå°±ä¸€ä¸ªmove dirè¿‡ç¨‹
+					//ä¸è¦åœ¨è¿™é‡Œåˆ¤æ–­ï¼Œå› ä¸ºå¯èƒ½å­©å­è¿˜æ²¡æœ‰copyè¿‡æ¥ï¼Œå¤ªæ—©äº†
 					goto filt_this;
 				}
 				if(path == m_expert_path)
-				{//×Ô¼º¸Ä±äÁËËµÃ÷ÕâÊÇÒ»¸öÌí¼Ó¹ı³Ì
-					//win7»áÕâÀïµÄ´¥·¢£¬µ¼ÖÂÏÂÃæµÄÅĞ¶Ï²»»áµ½´ï, µ«ÊÇxp²»»áµ½ÕâÀï
+				{//è‡ªå·±æ”¹å˜äº†è¯´æ˜è¿™æ˜¯ä¸€ä¸ªæ·»åŠ è¿‡ç¨‹
+					//win7ä¼šè¿™é‡Œçš„è§¦å‘ï¼Œå¯¼è‡´ä¸‹é¢çš„åˆ¤æ–­ä¸ä¼šåˆ°è¾¾, ä½†æ˜¯xpä¸ä¼šåˆ°è¿™é‡Œ
 					m_expert_act = maybe_copy_dir;
 					last.act = DIR_ADDED;
 					last.handled = true;
@@ -1246,7 +1246,7 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 			}
 
 			if(act == FILE_ACTION_ADDED && m_expert_path == GetBaseDIR(path)) { 
-				//win7²»»áµ½´ïÕâÀï, µ«ÊÇxpµ½...
+				//win7ä¸ä¼šåˆ°è¾¾è¿™é‡Œ, ä½†æ˜¯xpåˆ°...
 				//dlog("last dir is father, so maybe this is copydir op");
 				m_expert_act = maybe_copy_dir;
 				//cout << "last act == " << last.act << " , now is DIR_ADD, last path = " << WideToMutilByte(last.path) << endl;
@@ -1254,7 +1254,7 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 				last.handled = true;
 				break;
 			}
-			//yes, ²ÂÖĞ, ÆäËûµÄ²Ù×÷À´ÁË, Áôµ½×îºó´¦Àí
+			//yes, çŒœä¸­, å…¶ä»–çš„æ“ä½œæ¥äº†, ç•™åˆ°æœ€åå¤„ç†
 		}
 		else{
 			report_unexpert(notify, m_expert_path);
@@ -1267,21 +1267,21 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 	{
 	case maybe_copy_dir:
 		if(act == FILE_ACTION_ADDED) {
-			if(isChildren(m_expert_path, path)) //Õı³£µÄÄ¿Â¼copy
-			{ //XXX ÕâÀïÖ±½ÓÅĞ¶ÏÊÇÎÄ¼ş»¹ÊÇÄ¿Â¼, ÔİÊ±»¹ÊÇÓÃ FILE_ACTION_ADDED£¬±ÜÃâÒıÈë»ìÂÒ
+			if(isChildren(m_expert_path, path)) //æ­£å¸¸çš„ç›®å½•copy
+			{ //XXX è¿™é‡Œç›´æ¥åˆ¤æ–­æ˜¯æ–‡ä»¶è¿˜æ˜¯ç›®å½•, æš‚æ—¶è¿˜æ˜¯ç”¨ FILE_ACTION_ADDEDï¼Œé¿å…å¼•å…¥æ··ä¹±
 				notify.act = notify.isdir == false ? FILE_ACTION_ADDED : DIR_ADDED;
 				notify.handled = true;
 				return false;
 			}
-			//²»ÊÇÆÚ´ıµÄÄ¿Â¼µÄadd²Ù×÷, ÄÇÃ´ÉÏ´Î²ÂÏë²Ù×÷½áÊøÁË
+			//ä¸æ˜¯æœŸå¾…çš„ç›®å½•çš„addæ“ä½œ, é‚£ä¹ˆä¸Šæ¬¡çŒœæƒ³æ“ä½œç»“æŸäº†
 			m_expert_act = none_op;
 		}else if(act == FILE_ACTION_MODIFIED){
 			if(notify.isdir)
 				goto filt_this;
-			//ÎÄ¼ş¸Ä±ä, Ñ¹ËõÍ¨Öª
+			//æ–‡ä»¶æ”¹å˜, å‹ç¼©é€šçŸ¥
 		} else{
-			//¿ÉÄÜ½»²æÁËÆäËû¹ı³Ì£¨ÒòÎªÎÄ¼ş¿½±´ÊÇ¸öÂş³¤¹ı³Ì£©
-			//µ«ÊÇÕâ¸ö¹ı³ÌÓÖÊÇ¿ÉÒÔ¶ÀÁ¢µÄ£¬²»Ó°Ïì
+			//å¯èƒ½äº¤å‰äº†å…¶ä»–è¿‡ç¨‹ï¼ˆå› ä¸ºæ–‡ä»¶æ‹·è´æ˜¯ä¸ªæ¼«é•¿è¿‡ç¨‹ï¼‰
+			//ä½†æ˜¯è¿™ä¸ªè¿‡ç¨‹åˆæ˜¯å¯ä»¥ç‹¬ç«‹çš„ï¼Œä¸å½±å“
 			m_expert_act = none_op;
 		}
 		break;
@@ -1289,36 +1289,36 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 	case maybe_move_dir:
 		notification_t & last = m_notifications[size-m_guess_cnt];
 		if(act == FILE_ACTION_MODIFIED && notify.isdir)
-		{//XXX ×¢ÒâÈç¹ûÊÇ¸ùÄ¿Â¼ÏÂ£¬¾ÍÊÕ²»µ½Õâ¸ö¸¸Ä¿Â¼µÄ¸ü¸ÄÍ¨Öª
-			if(m_guess_cnt == 1) //must be ÒòÎªÎÒºöÂÔÁËÎÄ¼ş¼ĞµÄĞŞ¸Ä
+		{//XXX æ³¨æ„å¦‚æœæ˜¯æ ¹ç›®å½•ä¸‹ï¼Œå°±æ”¶ä¸åˆ°è¿™ä¸ªçˆ¶ç›®å½•çš„æ›´æ”¹é€šçŸ¥
+			if(m_guess_cnt == 1) //must be å› ä¸ºæˆ‘å¿½ç•¥äº†æ–‡ä»¶å¤¹çš„ä¿®æ”¹
 			{
-				if (path == GetBaseDIR(m_expert_path))//½Ó×ÅÀ´µÄÊÇ¸¸Â·¾¶µÄĞŞ¸Ä
+				if (path == GetBaseDIR(m_expert_path))//æ¥ç€æ¥çš„æ˜¯çˆ¶è·¯å¾„çš„ä¿®æ”¹
 				{
 					last.act = m_expert_act == maybe_move_dir ? DIR_REMOVED : FILE_REMOVED;
 					last.handled = true;
 					m_expert_act = none_op;
-					//Õâ¾ÍÊÇÒ»¸öremove²Ù×÷£¬ÄÇÃ´¹ıÂË×ÓÎÄ¼şµÄ¶¯×÷, µ«²»ÓÃ£¬ÒòÎª²ÂÏëµÄ¶¯×÷Ö®ºó¾ÍÒÑ¾­¹ıÂËÁË
-					//É¾³ıÎÄ¼şÃ»Ê²Ã´´¦ÀíµÄ	
-				}//else, ok, ÕâÊÇÒ»¸ömove²Ù×÷,ÕâÀïÀ´µÄÊÇÄ¿±êµØÖ·µÄ¸¸Ä¿Â¼
+					//è¿™å°±æ˜¯ä¸€ä¸ªremoveæ“ä½œï¼Œé‚£ä¹ˆè¿‡æ»¤å­æ–‡ä»¶çš„åŠ¨ä½œ, ä½†ä¸ç”¨ï¼Œå› ä¸ºçŒœæƒ³çš„åŠ¨ä½œä¹‹åå°±å·²ç»è¿‡æ»¤äº†
+					//åˆ é™¤æ–‡ä»¶æ²¡ä»€ä¹ˆå¤„ç†çš„	
+				}//else, ok, è¿™æ˜¯ä¸€ä¸ªmoveæ“ä½œ,è¿™é‡Œæ¥çš„æ˜¯ç›®æ ‡åœ°å€çš„çˆ¶ç›®å½•
 				goto filt_this;
 			}
 		}
 		if(act == FILE_ACTION_ADDED || act == FILE_ACTION_MODIFIED)
-		{//modifyÊÇ¼ôÇĞÕ³ÌùÊ±ºò¸²¸ÇÍ¬ÃûÎÄ¼ş¸øµÄÍ¨Öª
+		{//modifyæ˜¯å‰ªåˆ‡ç²˜è´´æ—¶å€™è¦†ç›–åŒåæ–‡ä»¶ç»™çš„é€šçŸ¥
 			if((!notify.exist || 
 				(notify.isdir && m_expert_act == maybe_move_dir) ||
 				m_expert_act == maybe_move_file )
-			   && GetFileName(path) == GetFileName(m_expert_path)) //Ã»·¨ÅĞ¶Ï¸ü¶àÁË
+			   && GetFileName(path) == GetFileName(m_expert_path)) //æ²¡æ³•åˆ¤æ–­æ›´å¤šäº†
 			{
 				//cout << "in guess move act" << endl;
 				if(path == m_expert_path)
-				{//±»ÇĞ³öÈ¥ÓÖÇĞ»ØÀ´£¨office ppt)
+				{//è¢«åˆ‡å‡ºå»åˆåˆ‡å›æ¥ï¼ˆoffice ppt)
 					no_need_guess = true;
 					m_expert_act = none_op;
 					break;
 				}
 				if(last.expert_act == m_expert_act)
-				{//´¦Àí
+				{//å¤„ç†
 					//cout << "we get move act" << endl;
 					last.filted = true;
 					notify.act = notify.isdir ? DIR_MOVED : FILE_MOVED;
@@ -1328,8 +1328,8 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 					no_need_guess = true;
 					m_expert_act = none_op;
 					//filt_old = false;
-					//±¾À´Ã»ÓĞÓÃÕâ¸ömovedÏûÏ¢À´¹ıÂËµÄ£¬µ«ÊÇÒòÎªxpµÄÎÄ¼ş¸²¸Ç»áÏÈ²úÉúÒ»¸öÉ¾³ıÏûÏ¢
-					//ËùÒÔÒª¹ıÂËµôÄÇ¸öÉ¾³ıÏûÏ¢
+					//æœ¬æ¥æ²¡æœ‰ç”¨è¿™ä¸ªmovedæ¶ˆæ¯æ¥è¿‡æ»¤çš„ï¼Œä½†æ˜¯å› ä¸ºxpçš„æ–‡ä»¶è¦†ç›–ä¼šå…ˆäº§ç”Ÿä¸€ä¸ªåˆ é™¤æ¶ˆæ¯
+					//æ‰€ä»¥è¦è¿‡æ»¤æ‰é‚£ä¸ªåˆ é™¤æ¶ˆæ¯
 					goto filt_record;
 					break;
 				}
@@ -1341,17 +1341,17 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 			}
 		}
 		else if(act == FILE_ACTION_REMOVED || L"" == GetBaseDIR(m_expert_path))
-		{//Ö±½ÓÀ´µÄ¾ÍÊÇÁíÒ»¸öÉ¾³ı²Ù×÷ »òÕß ¸¸Â·¾¶ÊÇ¿ÕÃ»ÊÕµ½
+		{//ç›´æ¥æ¥çš„å°±æ˜¯å¦ä¸€ä¸ªåˆ é™¤æ“ä½œ æˆ–è€… çˆ¶è·¯å¾„æ˜¯ç©ºæ²¡æ”¶åˆ°
 			last.act = m_expert_act == maybe_move_dir ? DIR_REMOVED : FILE_REMOVED;
 			last.handled = true;
 			if(isChildren(m_expert_path, path))
-			{//ÊÇÉ¾³ıÄ¿Â¼µÄº¢×Ó£¬ºöÂÔ.ÒòÎªÓĞ¿ÉÄÜ³öÏÖ¸¸Â·¾¶ºÍº¢×ÓÉ¾³ıÍ¨ÖªµÄË³Ğòµßµ¹ÁË£¨Á½¸öº¢×ÓµÄÊ±ºò£©
-				//XXX ĞŞ¸ÄºóÑéÖ¤ÊÇ·ñµßµ¹, ºÃÏñ²»»á
+			{//æ˜¯åˆ é™¤ç›®å½•çš„å­©å­ï¼Œå¿½ç•¥.å› ä¸ºæœ‰å¯èƒ½å‡ºç°çˆ¶è·¯å¾„å’Œå­©å­åˆ é™¤é€šçŸ¥çš„é¡ºåºé¢ å€’äº†ï¼ˆä¸¤ä¸ªå­©å­çš„æ—¶å€™ï¼‰
+				//XXX ä¿®æ”¹åéªŒè¯æ˜¯å¦é¢ å€’, å¥½åƒä¸ä¼š
 				goto filt_this;
 			}
 		}
 		else 
-		{ //¿ÉÄÜ±»ÆäËû¶¯×÷´ò¶Ï£¬µ«ÊÇÔ­¶¯×÷±ä³ÉÉ¾³ı/Ìí¼Ó£¬TODO£ºÕâÀï¿ÉÄÜÓÃ¶à¸ösessionÀ´¸Ä½ø
+		{ //å¯èƒ½è¢«å…¶ä»–åŠ¨ä½œæ‰“æ–­ï¼Œä½†æ˜¯åŸåŠ¨ä½œå˜æˆåˆ é™¤/æ·»åŠ ï¼ŒTODOï¼šè¿™é‡Œå¯èƒ½ç”¨å¤šä¸ªsessionæ¥æ”¹è¿›
 			report_unexpert(notify, m_expert_path);
 		}
 		m_expert_act = none_op;
@@ -1361,15 +1361,15 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 
 	if(handle)
 	{
-		//À´´¦Àí¸÷ÖÖÇé¿ö
+		//æ¥å¤„ç†å„ç§æƒ…å†µ
 		switch (act)
 		{
 		case FILE_ACTION_ADDED:
-			/* ²»¹ıÂË£¬ËäÈ»ÎÄ¼ş²»´æÔÚ£¬ºóÃæµÄÍ¨ÖªĞèÒªÕâ¸öadded£¬×ÜÖ®»á±»¹ıÂËµôµÄ
+			/* ä¸è¿‡æ»¤ï¼Œè™½ç„¶æ–‡ä»¶ä¸å­˜åœ¨ï¼Œåé¢çš„é€šçŸ¥éœ€è¦è¿™ä¸ªaddedï¼Œæ€»ä¹‹ä¼šè¢«è¿‡æ»¤æ‰çš„
 			   if(!notify.exist) goto filt_this; */
 			break;
 		case FILE_ACTION_MODIFIED:
-			if(notify.isdir || notify.fspec || !notify.exist)//ÎÄ¼ş¼Ğ»òÒş²ØÎÄ¼şĞŞ¸Ä£¬ºöÂÔ
+			if(notify.isdir || notify.fspec || !notify.exist)//æ–‡ä»¶å¤¹æˆ–éšè—æ–‡ä»¶ä¿®æ”¹ï¼Œå¿½ç•¥
 				goto filt_this;
 			no_need_guess = true;
 			break;
@@ -1382,7 +1382,7 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 			notification_t & last = m_notifications[size-1];
 			assert(last.act == FILE_ACTION_RENAMED_OLD_NAME);
 
-			//¸ÄÃûÊôĞÔÃ»ÓĞ±ä»¯
+			//æ”¹åå±æ€§æ²¡æœ‰å˜åŒ–
 			last.filted = true;
 			notify.act = notify.isdir ? DIR_RENAMED : FILE_RENAMED;
 			notify.handled = true;
@@ -1390,7 +1390,7 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 			notify.spec2 = last.special;
 			no_need_guess = true;
 			m_expert_act = none_op;
-			//Î¨Ò»Ò»¸öĞèÒªÁ½¸öÂ·¾¶µÄ
+			//å”¯ä¸€ä¸€ä¸ªéœ€è¦ä¸¤ä¸ªè·¯å¾„çš„
 			if(m_blacklist->Query(notify.act, notify.path2, notify.path))
 				goto filt_this;
 			break;
@@ -1398,7 +1398,7 @@ bool DirectoryMonitor::filt_notify2(notification_t & notify)
 	}
 
 	if(!no_need_guess && m_expert_act == none_op)
-	{ // ´¦ÀíÇé¿ö
+	{ // å¤„ç†æƒ…å†µ
 		guess(notify);
 	}
 
@@ -1414,10 +1414,10 @@ filt_this:
 	return true;
 }
 
-//·µ»Ø·¢ËÍµÄÊıÁ¿
+//è¿”å›å‘é€çš„æ•°é‡
 int DirectoryMonitor::SendNotify()
 {
-	m_expert_act = none_op; //ĞÂµÄ¿ªÊ¼
+	m_expert_act = none_op; //æ–°çš„å¼€å§‹
 	size_t size = m_notifications.size();
 	LocalNotification ln;
 	ln.basedir = m_home;
@@ -1427,7 +1427,7 @@ int DirectoryMonitor::SendNotify()
 	{
 		//ExplainAction2(*it, m_id);
 
-		//ÆÁ±ÎÏûÏ¢Ä¿Â¼µÄÏûÏ¢È«²¿¹ıÂË
+		//å±è”½æ¶ˆæ¯ç›®å½•çš„æ¶ˆæ¯å…¨éƒ¨è¿‡æ»¤
 		if(isChildren(m_silent_dir, it->path))
 			continue;
 		if(
@@ -1438,21 +1438,21 @@ int DirectoryMonitor::SendNotify()
 		  )
 			continue;
 		if((it->act == FILE_MOVED || it->act == DIR_MOVED)){
-			if(it->special && !it->spec2)	//ÒÆ¶¯µ½Òş²ØÄ¿Â¼£¬µ±É¾³ı
+			if(it->special && !it->spec2)	//ç§»åŠ¨åˆ°éšè—ç›®å½•ï¼Œå½“åˆ é™¤
 			{
 				it->act = it->act==FILE_MOVED ? FILE_REMOVED : DIR_REMOVED;
 				it->special = false;
 				it->path = it->path2;
 			}
-			if(!it->special && it->spec2)	//´ÓÒş²ØÄ¿Â¼ÒÆ¶¯µ½Êµ¼ÊµÄÄ¿Â¼£¬µ±ĞÂÔö
+			if(!it->special && it->spec2)	//ä»éšè—ç›®å½•ç§»åŠ¨åˆ°å®é™…çš„ç›®å½•ï¼Œå½“æ–°å¢
 				it->act = it->act==FILE_MOVED ? FILE_ADDED : 
 					(hasChildren(m_homew + L'\\' + it->path) ? DIR_COPY : DIR_ADDED);
 		}
-		if(it->act == FILE_RENAMED){	//case tmpÎÄ¼şÎÒÃÇ¹ıÂËµôÁË
-			if(it->special && !it->spec2)	//µ±É¾³ı
+		if(it->act == FILE_RENAMED){	//case tmpæ–‡ä»¶æˆ‘ä»¬è¿‡æ»¤æ‰äº†
+			if(it->special && !it->spec2)	//å½“åˆ é™¤
 			{
 				if(isOffice(it->path2))
-				{//XXX office ÎÄ¼şÌØÊâ´¦Àí
+				{//XXX office æ–‡ä»¶ç‰¹æ®Šå¤„ç†
 					cout << "office rename filed: from " << WideToMutilByte(it->path2) 
 						<< " ,to " << WideToMutilByte(it->path) << endl;
 					it->filted = true;
@@ -1464,7 +1464,7 @@ int DirectoryMonitor::SendNotify()
 					it->path = it->path2;
 				}
 			}
-			if(!it->special && it->spec2)	//µ±ĞÂÔö
+			if(!it->special && it->spec2)	//å½“æ–°å¢
 			{
 				cout << "office rename as NEW: from " << WideToMutilByte(it->path2) 
 					<< " ,to " << WideToMutilByte(it->path) << endl;
@@ -1484,7 +1484,7 @@ int DirectoryMonitor::SendNotify()
 			}
 			else if(it->act == FILE_ACTION_ADDED || it->act == FILE_ACTION_MODIFIED)
 			{
-				//×Ô¼ºÊÇÒş²ØµÄ, Ä¿Ç°Ö»ÊÇÑéÖ¤ÎÄ¼şĞŞ¸ÄÃ»
+				//è‡ªå·±æ˜¯éšè—çš„, ç›®å‰åªæ˜¯éªŒè¯æ–‡ä»¶ä¿®æ”¹æ²¡
 				if(it->attr != -1 && isSpecial(it->attr))
 				{
 					DWORD attr = ::GetFileAttributes((m_homew + L"/" + it->path).c_str());
@@ -1497,7 +1497,7 @@ int DirectoryMonitor::SendNotify()
 				}
 			}
 		}
-		//´òÓ¡log
+		//æ‰“å°log
 		ExplainAction2(*it, m_id);
 
 		if(!m_showfilt && it->filted) //m_showfilt for debug
@@ -1535,7 +1535,7 @@ int DirectoryMonitor::SendNotify()
 			}
 			op.act = it->act;
 
-			//ÓÃÀ´¹ıÂË×ª±äºóµÄÆÁ±ÎÏûÏ¢£¬ËãÊÇ×îºóÍ¨ÖªÇ°×îºóÒ»µÀ·ÀÏß
+			//ç”¨æ¥è¿‡æ»¤è½¬å˜åçš„å±è”½æ¶ˆæ¯ï¼Œç®—æ˜¯æœ€åé€šçŸ¥å‰æœ€åä¸€é“é˜²çº¿
 			switch(it->act)
 			{
 			case FILE_RENAMED:
@@ -1551,10 +1551,10 @@ int DirectoryMonitor::SendNotify()
 				break;
 			}
 			if(fpath != ln.fpath)
-			{//¸¸Â·¾¶²»Í¬,Í¨Öª¿Í»§¶Ë
+			{//çˆ¶è·¯å¾„ä¸åŒ,é€šçŸ¥å®¢æˆ·ç«¯
 				if(!ln.ops.empty())
 				{
-					//TODO: Ö§³ÖÅúÁ¿²Ù×÷
+					//TODO: æ”¯æŒæ‰¹é‡æ“ä½œ
 					m_cbp(m_varg, &ln);
 					ln.ops.clear();
 				}
@@ -1575,7 +1575,7 @@ int DirectoryMonitor::SendNotify()
 	return size;
 }
 
-//ÔÚ³¬Ê±Ê±ºòÊÍ·Å×ÊÔ´
+//åœ¨è¶…æ—¶æ—¶å€™é‡Šæ”¾èµ„æº
 void DirectoryMonitor::release_resource()
 {
 	if(m_file_attrs.size() > MAX_CACHE_SIZE)

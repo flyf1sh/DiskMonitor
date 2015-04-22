@@ -7,13 +7,13 @@ using namespace std;
 
 #define MSG_WAIT_INTERVAL 500*2
 
-//´¦ÀíËùÓĞÄ¿Â¼changesµÄÀà£¬ÊÇÒ»¸öµ¥¼ş
-//Õâ¸öÀàÊµÀıÓĞ¸öworkerÏß³ÌÀ´´¦ÀíËùÓĞµÄ¸Ä±ä£¬²¢ÇÒ»Øµ÷Ã¿¸ö¼à¿ØÇëÇóµÄ»Øµ÷
+//å¤„ç†æ‰€æœ‰ç›®å½•changesçš„ç±»ï¼Œæ˜¯ä¸€ä¸ªå•ä»¶
+//è¿™ä¸ªç±»å®ä¾‹æœ‰ä¸ªworkerçº¿ç¨‹æ¥å¤„ç†æ‰€æœ‰çš„æ”¹å˜ï¼Œå¹¶ä¸”å›è°ƒæ¯ä¸ªç›‘æ§è¯·æ±‚çš„å›è°ƒ
 class DirectoryChangeHandler
 {
 	friend class DirectoryMonitor;
 public:
-	//ÓĞ¸öworkerÏß³ÌÀ´´¦ÀíËùÓĞµÄÇëÇó£¬ÕâÑù¼õÉÙmonitorÏß³ÌµÄ¸ºµ£
+	//æœ‰ä¸ªworkerçº¿ç¨‹æ¥å¤„ç†æ‰€æœ‰çš„è¯·æ±‚ï¼Œè¿™æ ·å‡å°‘monitorçº¿ç¨‹çš„è´Ÿæ‹…
 	DirectoryChangeHandler(int typeNum, int threadMax=3, DWORD waittime=MSG_WAIT_INTERVAL);
 	~DirectoryChangeHandler();
 	BOOL Terminate();
@@ -23,7 +23,7 @@ private:
 	BOOL AddDirectory(DirectoryMonitor * monitor);
 	BOOL DelDirectory(DirectoryMonitor * monitor);
 
-	//worker Ïß³Ì´¦Àíº¯Êı
+	//worker çº¿ç¨‹å¤„ç†å‡½æ•°
 	void handle_timeout();
 	void handle_notify(int index);
 
@@ -32,7 +32,7 @@ private:
 	}
 	
 	static unsigned int WINAPI WorkThreadProc(LPVOID arg);
-	//APC º¯Êı
+	//APC å‡½æ•°
 	static void CALLBACK AddDirectoryProc(__in  ULONG_PTR arg);
 	static void CALLBACK DelDirectoryProc(__in  ULONG_PTR arg);
 	static void CALLBACK TerminateProc(__in  ULONG_PTR arg);
@@ -42,12 +42,12 @@ private:
 
 	HANDLE m_hThread;
 	unsigned int m_dwThreadId;
-	DWORD m_waittime;	//µÈ´ı»½ĞÑÊ±¼ä
-	DWORD m_def_waittime;	//Ä¬ÈÏµÈ´ıÊ±¼ä
-	map<int, DirectoryMonitor*>			m_monitors;		//»Øµ÷ĞèÒªÕâ¸ö
+	DWORD m_waittime;	//ç­‰å¾…å”¤é†’æ—¶é—´
+	DWORD m_def_waittime;	//é»˜è®¤ç­‰å¾…æ—¶é—´
+	map<int, DirectoryMonitor*>			m_monitors;		//å›è°ƒéœ€è¦è¿™ä¸ª
 	map<string, CReadDirectoryChanges*> m_changes;		//type => changes
 
-	//Í¬²½¹ÜÀí
+	//åŒæ­¥ç®¡ç†
 	unsigned int m_nHandles;
 	HANDLE					m_changeHandles[MAXIMUM_WAIT_OBJECTS];
 	CReadDirectoryChanges * m_changeArr[MAXIMUM_WAIT_OBJECTS];
