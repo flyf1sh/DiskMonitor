@@ -191,13 +191,13 @@ public:
 		CSLock lock(m_guard);
 		if(m_blist.empty()) return 0;
 		int inactive = 0, no_compl = 0;
-		for(iter_type it = m_blist.begin(); it != m_blist.end(); ++it)
+		for(iter_type it = m_blist.begin(); it != m_blist.end();)
 		{
 			if(it->_gen <= 0) {
 				it->_gen--;
 				if(it->_gen <= -BLACKLIST_CLEAR_UPBOUND) {
 					dout << "items: " << it->_id << " timeout inactive("<< it->_gen << ") " << *it << dendl;
-					m_blist.erase(it);
+					it = m_blist.erase(it);
 					continue;
 				}
 				inactive++; 
@@ -206,11 +206,12 @@ public:
 				it->_gen++;
 				if(it->_gen > BLACKLIST_CLEAR_UPBOUND) {
 					dout << "items: " << it->_id << " timeout not complete("<< it->_gen << ") " << *it << dendl;
-					m_blist.erase(it);
+					it = m_blist.erase(it);
 					continue;
 				}
 				no_compl++;
 			}
+			++it;
 			dout << "items: " << it->_id << " in the air, in active?" << (it->_gen < 0 ? "No" : "Yes") << dendl;
 		}
 		return no_compl + inactive;
@@ -679,7 +680,8 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 			actives.push_front(bl_item);
 
 			err = CreateOfficeFile(wstr_from_full.c_str());		//不能直接用因为末尾多了个\0
-			exist_is_ok = true;
+			if(err == ERROR_FILE_EXISTS)
+				exist_is_ok = true;
 		}
 		else
 		{
@@ -839,7 +841,7 @@ DWORD DirectoryMonitor::DoActWithoutNotify(int act, const string & from, const s
 
 		FileOp.pFrom = wstr_from_full.c_str(); 
 		FileOp.pTo = wstr_to_full.c_str();	//移动，附带了重命名
-		FileOp.wFunc = FO_MOVE; 
+		FileOp.wFunc = FO_RENAME; 
 		err = ::SHFileOperation(&FileOp);
 		break;
 	case 5:	//拷贝

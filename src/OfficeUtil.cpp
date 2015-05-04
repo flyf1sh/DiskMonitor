@@ -80,7 +80,7 @@ int CreateOfficeFile(const wstring & wpath)
 	}
 	catch(CreateOfficeException &e)
 	{
-		wcout << L"create file:" << wpath << L" ,meet err:"<< e.what() << endl;
+		dout << "create file:" << WideToMutilByte(wpath) << " ,meet err:"<< WideToMutilByte(e.what()) << dendl;
 	}
 	return ERROR_BUSY;
 }
