@@ -211,8 +211,8 @@ public:
 				}
 				no_compl++;
 			}
-			++it;
 			dout << "items: " << it->_id << " in the air, in active?" << (it->_gen < 0 ? "No" : "Yes") << dendl;
+			++it;
 		}
 		return no_compl + inactive;
 	}
